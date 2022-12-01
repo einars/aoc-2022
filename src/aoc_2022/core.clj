@@ -3,7 +3,7 @@
   (:gen-class))
 
 (def days 
-  [[1 day1/solve nil]])
+  [[1 day1/solve-1 day1/solve-2]])
 
 (defn -main
   "Run all AOC tasks"
