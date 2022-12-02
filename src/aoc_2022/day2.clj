@@ -1,9 +1,23 @@
 (ns aoc-2022.day2
   (:require [clojure.test :as test :refer [deftest]])
   (:require [clojure.string :as str])
+  (:require [clojure.tools.trace :as trace :refer [deftrace]])
   (:require [aoc-2022.helpers :as h]))
 
-(def shape-score {:rock 1, :paper 2, :scissors 3} )
+(def shape-score {:rock 1, :paper 2, :scissors 3})
+
+(defn part-1-mapping [p1 p2]
+  (let [m {:a :rock, :x :rock, :b :paper, :y :paper, :c :scissors, :z :scissors}]
+    (list (m p1) (m p2))))
+
+(defn part-2-mapping [p1 p2]
+  (let [m {:a :rock
+          ,:b :paper
+          ,:c :scissors
+          ,:x {:rock :scissors, :paper :rock,     :scissors :paper} ; lose
+          ,:y {:rock :rock,     :paper :paper,    :scissors :scissors} ; draw
+          ,:z {:rock :paper,    :paper :scissors, :scissors :rock}}] ; win
+      (list (m p1) ((m p2) (m p1)))))
 
 (defn beats? 
   [shape over]
@@ -13,46 +27,47 @@
     (and (= shape :scissors) (= over :paper))))
 
 (defn play-rock-scissors-round
-  "Plays a round of rock n scissors, returns scores for both players
-  A|X = rock
-  B|Y = paper
-  C|Z = scissors
-  "
-  [a b]
-  (let [mapping {:a :rock, :x :rock, :b :paper, :y :paper, :c :scissors, :z :scissors}
-        ma (mapping (keyword (str/lower-case a)))
-        mb (mapping (keyword (str/lower-case b)))]
-
+  "Plays a round of rock n scissors, returns scores for both players"
+  [mapping a b]
+  (let [[ma mb] (mapping (keyword (str/lower-case a))
+                         (keyword (str/lower-case b)))]
       (cond
         (= ma mb) [(+ 3 (shape-score ma)) (+ 3 (shape-score mb))]
         (beats? ma mb) [(+ 6 (shape-score ma)) (shape-score mb)]
         :else [(shape-score ma) (+ 6 (shape-score mb))])))
 
+(def play-rock-scissors-1 (partial play-rock-scissors-round part-1-mapping))
+(def play-rock-scissors-2 (partial play-rock-scissors-round part-2-mapping))
+
 (defn follow-guide
-  [lines]
+  [lines rock-scissors-fn]
   (reduce 
     (fn [[a b] [aa bb]] [(+ a aa) (+ b bb)] )
     [0 0]
-    (mapv #(apply play-rock-scissors-round (str/split % #" ")) lines)))
-
-
+    (mapv #(apply rock-scissors-fn (str/split % #" ")) lines)))
 
 
 (deftest test-rock-scissors []
   (test/are [x y] (= x y)
-    8 (second (play-rock-scissors-round "A" "Y"))
-    1 (second (play-rock-scissors-round "B" "X"))
-    6 (second (play-rock-scissors-round "C" "Z"))))
+    8 (second (play-rock-scissors-1 "A" "Y"))
+    1 (second (play-rock-scissors-1 "B" "X"))
+    6 (second (play-rock-scissors-1 "C" "Z"))
+    4 (second (play-rock-scissors-2 "A" "Y"))
+    1 (second (play-rock-scissors-2 "B" "X"))
+    7 (second (play-rock-scissors-2 "C" "Z"))))
 
 (deftest test-1 []
-  (test/is (= 15 (second (follow-guide (h/slurp-strings "resources/day2.test.txt"))))))
+  (test/is (= 15 (second (follow-guide (h/slurp-strings "resources/day2.test.txt") play-rock-scissors-1)))))
 
-(test/run-tests)
+(deftest test-2 []
+  (test/is (= 12 (second (follow-guide (h/slurp-strings "resources/day2.test.txt") play-rock-scissors-2)))))
+
+;(test/run-tests)
 
 (defn solve-1 []
-  (second (follow-guide (h/slurp-strings "resources/day2.txt"))))
+  (second (follow-guide (h/slurp-strings "resources/day2.txt") play-rock-scissors-1)))
 
 (defn solve-2 []
-  )
+  (second (follow-guide (h/slurp-strings "resources/day2.txt") play-rock-scissors-2)))
 
 
