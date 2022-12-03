@@ -1,6 +1,7 @@
 (ns aoc-2022.core
   (:require [aoc-2022.day1])
   (:require [aoc-2022.day2])
+  (:require [aoc-2022.day3])
   (:gen-class))
 
 (defn -main

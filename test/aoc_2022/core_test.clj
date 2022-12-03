@@ -2,6 +2,7 @@
   (:require [clojure.test :refer [run-tests]])
   (:require [aoc-2022.day1])
   (:require [aoc-2022.day2])
+  (:require [aoc-2022.day3])
   )
 
 (doseq [d (range 25)]
