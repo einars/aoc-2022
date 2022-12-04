@@ -10,11 +10,6 @@
   [line]
   (map make-range (str/split line #",")))
 
-(defn range-fully-contains
-  [[f1 t1] [f2 t2]]
-  (and (>= f2 f1 t2)
-       (>= f2 t1 t2)))
-
 (defn ranges-fully-contain-any?
   [[f1 t1] [f2 t2]]
   (or (<= f1 f2 t2 t1)
@@ -46,7 +41,7 @@
       count)))
 
 
-(deftest test [] 
+(deftest test-stuff [] 
   (test/are [x y] (= x y)
     false (ranges-fully-contain-any? '(2 4) '(6 8))
     true (ranges-fully-contain-any? '(6 6) '(4 6))
