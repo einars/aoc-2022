@@ -13,9 +13,7 @@
 (defn range-fully-contains
   [[f1 t1] [f2 t2]]
   (and (>= f2 f1 t2)
-       (>= f2 t1 t2)
-    )
-  )
+       (>= f2 t1 t2)))
 
 (defn ranges-fully-contain-any?
   [[f1 t1] [f2 t2]]
@@ -54,7 +52,6 @@
     true (ranges-fully-contain-any? '(6 6) '(4 6))
     true (ranges-fully-contain-any? '(4 6) '(6 6))
     2 (solve-1 "resources/day4.test.txt")
-    4 (solve-2 "resources/day4.test.txt")
-    ))
+    4 (solve-2 "resources/day4.test.txt")))
 
-(test/run-tests)
+;(test/run-tests)
