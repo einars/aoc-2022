@@ -10,7 +10,7 @@
       ; ...
       )))
 
-(defn solve-2
+(comment defn solve-2
   ([] (solve-2 "resources/dayN.txt"))
   ([file]
     (->>
@@ -18,7 +18,7 @@
       ; ...
       )))
 
-(deftest test [] 
+(deftest test-stuff [] 
   (test/are [x y] (= x y)
     true false
     ; 0 (solve-1 "resources/dayN.test.txt")
