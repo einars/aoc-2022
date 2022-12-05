@@ -3,6 +3,8 @@
   (:require [aoc-2022.day1])
   (:require [aoc-2022.day2])
   (:require [aoc-2022.day3])
+  (:require [aoc-2022.day4])
+  (:require [aoc-2022.day5])
   )
 
 (doseq [d (range 25)]

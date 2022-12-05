@@ -1,5 +1,5 @@
 (ns aoc-2022.dayN
-  (:require [clojure.test :as test :refer [deftest is]])
+  (:require [clojure.test :as test :refer [deftest]])
   (:require [aoc-2022.helpers :as h]))
 
 (defn solve-1
