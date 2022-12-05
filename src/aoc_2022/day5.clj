@@ -9,8 +9,7 @@
         box-defs (for [x (range 1 (count transposed) 4)] (nth transposed x))
         box-names (mapv first box-defs)
         box-names (mapv #(Integer/parseInt (str %)) box-names)
-        box-vals (mapv #(filter (partial not= \space) (reverse (rest %))) box-defs)
-    ]
+        box-vals (mapv #(filter (partial not= \space) (reverse (rest %))) box-defs)]
     (zipmap box-names box-vals)))
 
 (defn parse-move
@@ -32,8 +31,7 @@
     (let [[boxes moves] (h/slurp-blocks file)
           boxes (parse-boxes boxes)
           moves (mapv parse-move moves)
-          boxes (reduce apply-move boxes moves)
-      ]
+          boxes (reduce apply-move boxes moves)]
       (str/join (map first (vals (into (sorted-map) boxes)))))))
 
 (defn apply-move-no-reverse
@@ -50,8 +48,7 @@
     (let [[boxes moves] (h/slurp-blocks file)
           boxes (parse-boxes boxes)
           moves (mapv parse-move moves)
-          boxes (reduce apply-move-no-reverse boxes moves)
-      ]
+          boxes (reduce apply-move-no-reverse boxes moves)]
       (str/join (map first (vals (into (sorted-map) boxes)))))))
 
 
@@ -61,4 +58,3 @@
     "CMZ" (solve-1 "resources/day5.test.txt")
     "MCD" (solve-2 "resources/day5.test.txt")
     ))
-
