@@ -36,18 +36,29 @@
       ]
       (str/join (map first (vals (into (sorted-map) boxes)))))))
 
-(comment defn solve-2
+(defn apply-move-no-reverse
+  [boxes move]
+  (let [{:keys [src dst n]} move
+        transfer (take n (boxes src))]
+    (-> boxes
+      (assoc src (drop n (boxes src)))
+      (assoc dst (concat transfer (boxes dst))))))
+
+(defn solve-2
   ([] (solve-2 "resources/day5.txt"))
   ([file]
-    (->>
-      (h/slurp-strings file)
-      ; ...
-      )))
+    (let [[boxes moves] (h/slurp-blocks file)
+          boxes (parse-boxes boxes)
+          moves (mapv parse-move moves)
+          boxes (reduce apply-move-no-reverse boxes moves)
+      ]
+      (str/join (map first (vals (into (sorted-map) boxes)))))))
+
 
 (deftest test-stuff [] 
   (test/are [x y] (= x y)
     {:src 3, :dst 9, :n 7} (parse-move "move 7 from 3 to 9")
     "CMZ" (solve-1 "resources/day5.test.txt")
-    ; 0 (solve-2 "resources/day5.test.txt")
+    "MCD" (solve-2 "resources/day5.test.txt")
     ))
 
