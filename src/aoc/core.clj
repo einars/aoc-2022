@@ -1,6 +1,7 @@
 (ns aoc.core
   (:require [clojure.string :as str])
   (:require [aoc-2016.day1])
+  (:require [aoc-2016.day2])
 
   (:require [aoc-2022.day1])
   (:require [aoc-2022.day2])
