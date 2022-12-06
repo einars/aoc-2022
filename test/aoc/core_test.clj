@@ -1,4 +1,4 @@
-(ns aoc-2022.core-test
+(ns aoc.core-test
   (:require [aoc.core]) ; loads all namespaces
   (:require [clojure.test :refer [run-tests]]))
 
