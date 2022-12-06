@@ -3,15 +3,10 @@
   ;(:require [clojure.tools.trace :as trace])
   (:require [aoc-2022.helpers :as h]))
 
-(defn all-different? 
-  [ & elems]
-   (= (count (set elems))
-      (count elems)))
-
 (defn transmission-header-idx
   [transmission len]
   (let [blocks (partition len 1 transmission)]
-    (first (keep-indexed (fn [idx bytes] (when (apply all-different? bytes) idx)) blocks))))
+    (first (keep-indexed (fn [idx bytes] (when (apply distinct? bytes) idx)) blocks))))
 
 (defn transmission-start-idx
   [transmission]
