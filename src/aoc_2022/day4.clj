@@ -23,7 +23,7 @@
       (<= f2 t1 t2)))
 
 (defn solve-1
-  ([] (solve-1 "resources/day4.txt"))
+  ([] (solve-1 "resources/2022/day4.txt"))
   ([file]
     (->>
       (h/slurp-strings file)
@@ -32,7 +32,7 @@
       count)))
 
 (defn solve-2
-  ([] (solve-2 "resources/day4.txt"))
+  ([] (solve-2 "resources/2022/day4.txt"))
   ([file]
     (->>
       (h/slurp-strings file)
@@ -46,7 +46,7 @@
     false (ranges-fully-contain-any? '(2 4) '(6 8))
     true (ranges-fully-contain-any? '(6 6) '(4 6))
     true (ranges-fully-contain-any? '(4 6) '(6 6))
-    2 (solve-1 "resources/day4.test.txt")
-    4 (solve-2 "resources/day4.test.txt")))
+    2 (solve-1 "resources/2022/day4.test.txt")
+    4 (solve-2 "resources/2022/day4.test.txt")))
 
 ;(test/run-tests)

@@ -56,17 +56,17 @@
     7 (second (play-rock-scissors-2 :C :Z))))
 
 (deftest test-1 []
-  (test/is (= 15 (second (follow-guide (h/slurp-strings "resources/day2.test.txt") play-rock-scissors-1)))))
+  (test/is (= 15 (second (follow-guide (h/slurp-strings "resources/2022/day2.test.txt") play-rock-scissors-1)))))
 
 (deftest test-2 []
-  (test/is (= 12 (second (follow-guide (h/slurp-strings "resources/day2.test.txt") play-rock-scissors-2)))))
+  (test/is (= 12 (second (follow-guide (h/slurp-strings "resources/2022/day2.test.txt") play-rock-scissors-2)))))
 
 ;(test/run-tests)
 
 (defn solve-1 []
-  (second (follow-guide (h/slurp-strings "resources/day2.txt") play-rock-scissors-1)))
+  (second (follow-guide (h/slurp-strings "resources/2022/day2.txt") play-rock-scissors-1)))
 
 (defn solve-2 []
-  (second (follow-guide (h/slurp-strings "resources/day2.txt") play-rock-scissors-2)))
+  (second (follow-guide (h/slurp-strings "resources/2022/day2.txt") play-rock-scissors-2)))
 
 

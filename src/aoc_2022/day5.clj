@@ -26,7 +26,7 @@
       (assoc dst (concat (reverse transfer) (boxes dst))))))
 
 (defn solve-1
-  ([] (solve-1 "resources/day5.txt"))
+  ([] (solve-1 "resources/2022/day5.txt"))
   ([file]
     (let [[boxes moves] (h/slurp-blocks file)
           boxes (parse-boxes boxes)
@@ -43,7 +43,7 @@
       (assoc dst (concat transfer (boxes dst))))))
 
 (defn solve-2
-  ([] (solve-2 "resources/day5.txt"))
+  ([] (solve-2 "resources/2022/day5.txt"))
   ([file]
     (let [[boxes moves] (h/slurp-blocks file)
           boxes (parse-boxes boxes)
@@ -55,6 +55,6 @@
 (deftest test-stuff [] 
   (test/are [x y] (= x y)
     {:src 3, :dst 9, :n 7} (parse-move "move 7 from 3 to 9")
-    "CMZ" (solve-1 "resources/day5.test.txt")
-    "MCD" (solve-2 "resources/day5.test.txt")
+    "CMZ" (solve-1 "resources/2022/day5.test.txt")
+    "MCD" (solve-2 "resources/2022/day5.test.txt")
     ))

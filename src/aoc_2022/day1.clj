@@ -19,17 +19,17 @@
   (apply + (take 3 (sort > (elves-carrying lines)))))
 
 
-;(elf-carrying-most-calories (h/slurp-strings "resources/day1.test.txt"))
+;(elf-carrying-most-calories (h/slurp-strings "resources/2022/day1.test.txt"))
 
 (defn solve-1 []
-  (elf-carrying-the-most (h/slurp-strings "resources/day1.txt")))
+  (elf-carrying-the-most (h/slurp-strings "resources/2022/day1.txt")))
 
 (defn solve-2 []
-  (top3-elves-carrying-the-most (h/slurp-strings "resources/day1.txt")))
+  (top3-elves-carrying-the-most (h/slurp-strings "resources/2022/day1.txt")))
 
 (deftest self-test-1 []
-  (is (= (elf-carrying-the-most (h/slurp-strings "resources/day1.test.txt")) 24000)))
+  (is (= (elf-carrying-the-most (h/slurp-strings "resources/2022/day1.test.txt")) 24000)))
 
 (deftest self-test-2 []
-  (is (= (top3-elves-carrying-the-most (h/slurp-strings "resources/day1.test.txt")) 45000)))
+  (is (= (top3-elves-carrying-the-most (h/slurp-strings "resources/2022/day1.test.txt")) 45000)))
 

@@ -16,7 +16,7 @@
     [(set r1) (set r2)]))
 
 
-(def file "resources/day3.test.txt")
+(def file "resources/2022/day3.test.txt")
 
 (defn solve-single-line-1 
   [line]
@@ -34,7 +34,7 @@
     (reduce +)))
 
 (defn solve-1 
-  ([] (solve-1 "resources/day3.txt"))
+  ([] (solve-1 "resources/2022/day3.txt"))
   ([file]
     (->>
       (h/slurp-strings file)
@@ -43,7 +43,7 @@
       
 
 (defn solve-2
-  ([] (solve-2 "resources/day3.txt"))
+  ([] (solve-2 "resources/2022/day3.txt"))
   ([file]
     (->>
       (h/slurp-strings file)
@@ -59,8 +59,8 @@
     27 (score-of \A)
     52 (score-of \Z)
     [#{\a \b \c} #{\A \B \C}] (parse-rucksack "abcABC")
-    157 (solve-1 "resources/day3.test.txt")
-    70 (solve-2 "resources/day3.test.txt")
+    157 (solve-1 "resources/2022/day3.test.txt")
+    70 (solve-2 "resources/2022/day3.test.txt")
     ))
 
 

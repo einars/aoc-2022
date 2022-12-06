@@ -17,7 +17,7 @@
   (+ 14 (transmission-header-idx transmission 14)))
 
 (defn solve-1
-  ([] (solve-1 "resources/day6.txt"))
+  ([] (solve-1 "resources/2022/day6.txt"))
   ([file]
     (->>
       (h/slurp-strings file)
@@ -25,7 +25,7 @@
       transmission-start-idx)))
 
 (defn solve-2
-  ([] (solve-2 "resources/day6.txt"))
+  ([] (solve-2 "resources/2022/day6.txt"))
   ([file]
     (->>
       (h/slurp-strings file)
