@@ -12,26 +12,31 @@
 (def turn-left {up lt, lt dn, dn rt, rt up })
 (def turn-right {up rt, rt dn, dn lt, lt up })
 
-(def turn {\L turn-left, \R turn-right})
-
 (defn parse-move
   [move]
-  {:dir (first move)
-   :amount (Integer/parseInt (str/join (rest move)))})
+  [(first move) (repeat (Integer/parseInt (str/join (rest move))) \F) ])
 
-(defn apply-move 
-  [{:keys [dir amount]} pos facing]
-  (let [facing-now ((turn dir) facing)]
-  [(map + pos (map (partial * amount) facing-now))
-   facing-now]))
-
-(defn follow 
+(defn follow
   [trail] 
-  (loop [trail trail, pos [0 0], facing up]
-    (if (seq trail)
-      (let [[new-pos new-facing] (apply-move (first trail) pos facing)]
-        (recur (rest trail) new-pos new-facing))
-      pos)))
+  (loop [trail (flatten trail), pos [0 0], facing up]
+    (condp = (first trail)
+      \F (let [new-pos (map + pos facing)]
+        (recur (rest trail) new-pos facing))
+      \L (recur (rest trail) pos (turn-left facing))
+      \R (recur (rest trail) pos (turn-right facing))
+      nil pos)))
+
+(defn follow-until-seen
+  [trail] 
+  (loop [trail (flatten trail), pos [0 0], facing up, seen #{pos}]
+    (condp = (first trail)
+      \F (let [new-pos (map + pos facing)]
+            (if (seen new-pos)
+              new-pos
+              (recur (rest trail) new-pos facing (conj seen new-pos))))
+      \L (recur (rest trail) pos (turn-left facing) seen)
+      \R (recur (rest trail) pos (turn-right facing) seen)
+      nil nil)))
 
 (defn solve-1
   ([] (solve-1 "resources/2016/day1.txt"))
@@ -43,20 +48,24 @@
       (map abs)
       (reduce +))))
 
-(comment defn solve-2
+(defn solve-2
   ([] (solve-2 "resources/2016/day1.txt"))
   ([file]
     (->>
-      (str/split (slurp file) #", ")
-      ; ...
-      )))
+      (str/split (str/trim (slurp file)) #", ")
+      (map parse-move)
+      follow-until-seen
+      (map abs)
+      (reduce +))))
 
-(def r2 {:dir \R, :amount 2})
+(def r2 [\R \F \F])
 
 (deftest test-stuff [] 
   (test/are [x y] (= x y)
-    {:dir \L :amount 21} (parse-move "L21")
+    [\L \F \F \F \F \F] (flatten (parse-move "L5"))
     [0 -2] (follow [r2 r2 r2])
     [0 0] (follow [r2 r2 r2 r2])
-    [10 2] (follow [{:dir \R, :amount 5} {:dir \L :amount 5} {:dir \R :amount 5} {:dir \R :amount 3}])
+    nil (follow-until-seen [r2 r2 r2])
+    [0 0] (follow-until-seen [r2 r2 r2 r2])
+    [0 0] (follow-until-seen [r2 r2 r2 r2 r2])
     ))
