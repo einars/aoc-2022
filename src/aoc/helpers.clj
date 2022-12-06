@@ -1,4 +1,4 @@
-(ns aoc-2022.helpers
+(ns aoc.helpers
   (:require [clojure.string :as str])
   (:require [clojure.java.io :as io]))
 

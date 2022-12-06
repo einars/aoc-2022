@@ -1,7 +1,7 @@
 (ns aoc-2022.day5
   (:require [clojure.test :as test :refer [deftest]])
   (:require [clojure.string :as str])
-  (:require [aoc-2022.helpers :as h]))
+  (:require [aoc.helpers :as h]))
 
 (defn parse-boxes
   [bs]

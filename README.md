@@ -1,18 +1,20 @@
-# aoc-2022
+# advent-of-code
 
 Go away, here will be my Clojure solutions for this year's Advent of Code - 2022
 
-You probably don't need them. Solve the problems yourself!
+(and, as this year seems to be quite easy, probably some other years).
+
+You don't need this repo. Solve the problems yourself!
 
 ...but if you still do, you can find the code under src/aoc\_2022 and solve the problems with:
 
+  lein run 2022/6
+
   lein run
+
 
 and run the tests with
 
+  lein test 2022/6
   lein test
-
-
-
-
 

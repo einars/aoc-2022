@@ -2,7 +2,7 @@
   (:require [clojure.test :as test :refer [deftest]])
   (:require [clojure.string :as str])
   (:require [clojure.tools.trace :as trace :refer [deftrace]])
-  (:require [aoc-2022.helpers :as h]))
+  (:require [aoc.helpers :as h]))
 
 (def shape-score {:rock 1, :paper 2, :scissors 3})
 

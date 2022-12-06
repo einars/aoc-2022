@@ -1,7 +1,7 @@
 (ns aoc-2022.day4
   (:require [clojure.test :as test :refer [deftest is]])
   (:require [clojure.string :as str])
-  (:require [aoc-2022.helpers :as h]))
+  (:require [aoc.helpers :as h]))
 
 (defn make-range [range-s]
   (map #(Integer/parseInt %) (str/split range-s #"-")))
