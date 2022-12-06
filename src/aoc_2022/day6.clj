@@ -27,7 +27,6 @@
     (->>
       (h/slurp-strings file)
       first
-      seq
       transmission-start-idx)))
 
 (defn solve-2
@@ -36,7 +35,6 @@
     (->>
       (h/slurp-strings file)
       first
-      seq
       message-start-idx)))
 
 
