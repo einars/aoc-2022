@@ -11,6 +11,7 @@
   (let [ret (get-in m ks)]
     (when (not= ret \space) ret)))
 
+
 (defn template->moves
   [template]
   (into {}
@@ -19,11 +20,11 @@
           :let [ch (get-in template [y x])]
           :when (not= \space ch)]
 
-          [ ch {\U (tpl-get-in template [(dec y) x])
-                \D (tpl-get-in template [(inc y) x])
-                \L (tpl-get-in template [y (dec x)])
-                \R (tpl-get-in template [y (inc x)])}]
-          )))
+      [ch {\U (tpl-get-in template [(dec y) x])
+           \D (tpl-get-in template [(inc y) x])
+           \L (tpl-get-in template [y (dec x)])
+           \R (tpl-get-in template [y (inc x)])}]
+      )))
 
 (def moves-1 (template->moves ["     " " 123 " " 456 " " 789 " "     "]))
 (def moves-2 (template->moves ["  1  " " 234 " "56789" " ABC " "  D  "]))
@@ -54,20 +55,20 @@
 (defn solve-1
   ([] (solve-1 "resources/2016/day2.txt"))
   ([file]
-    (binding [*moveset* moves-1]
-      (->>
-        (h/slurp-strings file)
-        (walk-codes \5)
-        str/join))))
+   (binding [*moveset* moves-1]
+     (->>
+       (h/slurp-strings file)
+       (walk-codes \5)
+       str/join))))
 
 (defn solve-2
   ([] (solve-2 "resources/2016/day2.txt"))
   ([file]
-    (binding [*moveset* moves-2]
-      (->>
-        (h/slurp-strings file)
-        (walk-codes \5)
-        str/join))))
+   (binding [*moveset* moves-2]
+     (->>
+       (h/slurp-strings file)
+       (walk-codes \5)
+       str/join))))
 
 (deftest test-stuff [] 
   (test/are [x y] (= x y)

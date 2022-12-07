@@ -19,18 +19,18 @@
 (defn solve-1
   ([] (solve-1 "resources/2022/day6.txt"))
   ([file]
-    (->>
-      (h/slurp-strings file)
-      first
-      transmission-start-idx)))
+   (->>
+     (h/slurp-strings file)
+     first
+     transmission-start-idx)))
 
 (defn solve-2
   ([] (solve-2 "resources/2022/day6.txt"))
   ([file]
-    (->>
-      (h/slurp-strings file)
-      first
-      message-start-idx)))
+   (->>
+     (h/slurp-strings file)
+     first
+     message-start-idx)))
 
 
 (deftest test-stuff [] 

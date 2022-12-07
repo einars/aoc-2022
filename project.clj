@@ -4,6 +4,7 @@
   :license {:name "MIT"
             :url "https://opensource.org/licenses/MIT"}
   :dependencies [[org.clojure/clojure "1.11.1"]
+                 [org.clojure/core.match "1.0.0"]
                  [org.clojure/tools.trace "0.7.11"]
                  ]
   :main ^:skip-aot aoc.core

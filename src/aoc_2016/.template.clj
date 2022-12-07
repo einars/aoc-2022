@@ -7,18 +7,18 @@
 (defn solve-1
   ([] (solve-1 "resources/2016/dayN.txt"))
   ([file]
-    (->>
-      (h/slurp-strings file)
-      ; ...
-      )))
+   (->>
+     (h/slurp-strings file)
+     ; ...
+     )))
 
 (comment defn solve-2
   ([] (solve-2 "resources/2016/dayN.txt"))
   ([file]
-    (->>
-      (h/slurp-strings file)
-      ; ...
-      )))
+   (->>
+     (h/slurp-strings file)
+     ; ...
+     )))
 
 (deftest test-stuff [] 
   (test/are [x y] (= x y)
