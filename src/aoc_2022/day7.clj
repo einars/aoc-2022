@@ -6,8 +6,8 @@
   (:require [aoc.helpers :as h]))
 
 (def blank-hdd
- {:pwd []
-  :dirsizes { [] 0 }})
+  {:pwd []
+   :dirsizes { [] 0 }})
 
 (defn exec-cd
   [hdd path]
@@ -48,28 +48,32 @@
 (defn solve-1
   ([] (solve-1 "resources/2022/day7.txt"))
   ([file]
-    (->>
-      (h/slurp-strings file)
-      exec-cmds
-      :dirsizes
-      vals
-      (filter #(<= % 100000))
-      (reduce +))))
+   (->>
+     (h/slurp-strings file)
+     exec-cmds
+     :dirsizes
+     vals
+     (filter #(<= % 100000))
+     (reduce +))))
 
-(comment defn solve-2
+(defn solve-2
   ([] (solve-2 "resources/2022/day7.txt"))
   ([file]
-    (->>
-      (h/slurp-strings file)
-      ; ...
-      )))
+   (let [hdd (exec-cmds (h/slurp-strings file))
+         to-free (- (get-dir-size hdd []) 40000000)]
+     (->> hdd
+       :dirsizes
+       vals
+       (filter #(>= % to-free))
+       sort
+       first ))))
 
 (deftest test-stuff [] 
   (test/are [x y] (= x y)
     48381165 (get-dir-size (exec-cmds (h/slurp-strings "resources/2022/day7.test.txt")) [])
     94853 (get-dir-size (exec-cmds (h/slurp-strings "resources/2022/day7.test.txt")) ["a"])
     95437 (solve-1 "resources/2022/day7.test.txt")
-    ; 0 (solve-2 "resources/2022/day7.test.txt")
+    24933642 (solve-2 "resources/2022/day7.test.txt")
     ))
 
 
