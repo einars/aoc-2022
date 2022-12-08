@@ -10,6 +10,7 @@
   (:require [aoc-2022.day5])
   (:require [aoc-2022.day6])
   (:require [aoc-2022.day7])
+  (:require [aoc-2022.day8])
   (:gen-class))
 
 (defn solve
