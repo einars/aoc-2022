@@ -1,5 +1,7 @@
 (ns aoc.core
   (:require [clojure.string :as str])
+  (:require [clojure.pprint :as pprint])
+
   (:require [aoc-2016.day1])
   (:require [aoc-2016.day2])
 
@@ -21,9 +23,9 @@
         solve-2 (fns 'solve-2)]
 
     (when solve-1
-      (printf "%d/%d part 1 = %s\n" year day (solve-1)))
+      (printf "%d/%d part 1 = %s" year day (with-out-str (pprint/pprint (solve-1)))))
     (when solve-2
-      (printf "%d/%d part 2 = %s\n" year day (solve-2)))))
+      (printf "%d/%d part 2 = %s" year day (with-out-str (pprint/pprint (solve-2)))))))
 
 (defn -main
   "Run all AOC tasks"
