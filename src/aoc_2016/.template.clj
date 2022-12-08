@@ -1,7 +1,8 @@
 (ns aoc-2016.dayN
   (:require [clojure.test :as test :refer [deftest]])
   (:require [clojure.string :as str])
-  (:require [clojure.tools.trace :as trace])
+  (:require [clojure.tools.trace :refer [trace deftrace]])
+  (:require [clojure.pprint :as pprint])
   (:require [aoc.helpers :as h]))
 
 (defn solve-1

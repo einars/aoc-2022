@@ -2,9 +2,11 @@
   (:require [clojure.test :as test :refer [deftest]])
   (:require [clojure.set :as set])
   (:require [clojure.string :as str])
+  (:require [clojure.tools.trace :refer [trace deftrace]])
   (:require [clojure.pprint :as pprint])
-  (:require [clojure.tools.trace :refer [deftrace, trace]])
   (:require [aoc.helpers :as h]))
+
+;; part 1
 
 (defn walk-trees-visible
   [forest coord delta]
@@ -16,13 +18,24 @@
           (if (> new-height height)
             (recur new-coord new-height (conj accum new-coord))
             (recur new-coord height accum)))
-        accum) ) ) )
+        accum))))
 
 (defn trees-visible-dir
   "walk in direction delta from coordinates given by root-pred"
   [forest root-pred delta]
   (let [starting-coords (filter root-pred (keys forest))]
     (reduce set/union #{} (for [c starting-coords] (walk-trees-visible forest c delta)))))
+
+(defn visible-trees
+  "return a set of all tree coordinates that are visible from outside"
+  [[forest dimensions]]
+  (reduce set/union
+    [(trees-visible-dir forest #(= (:y %) 0) {:dy +1})
+     (trees-visible-dir forest #(= (:y %) (dec (dimensions :y))) {:dy -1})
+     (trees-visible-dir forest #(= (:x %) 0) {:dx 1})
+     (trees-visible-dir forest #(= (:x %) (dec (dimensions :x))) {:dx -1})]))
+
+;; part 2
 
 (defn tree-score-dir
   [forest coord delta]
@@ -36,15 +49,6 @@
             (recur new-coord (inc score)))
           score)))))
 
-(defn visible-trees
-  [[forest dimensions]]
-  (reduce set/union #{}
-    [(trees-visible-dir forest #(= (:y %) 0) {:dy +1})
-     (trees-visible-dir forest #(= (:y %) (dec (dimensions :y))) {:dy -1})
-     (trees-visible-dir forest #(= (:x %) 0) {:dx 1})
-     (trees-visible-dir forest #(= (:x %) (dec (dimensions :x))) {:dx -1})
-     ]))
-
 (defn tree-score-at
   [forest coord]
   (reduce *
@@ -55,9 +59,9 @@
 
 (defn find-best-tree-score
   [[forest _dimensions]]
-  ;(sort-by second (map #(vec [% (tree-score-at forest %)]) (keys forest))))
   (first (sort > (map #(tree-score-at forest %) (keys forest)))))
 
+;; stuff
 
 (defn solve-1
   ([] (solve-1 "resources/2022/day8.txt"))
@@ -74,5 +78,4 @@
     21 (solve-1 "resources/2022/day8.test.txt")
     8 (solve-2 "resources/2022/day8.test.txt")
     4 (tree-score-at (first (h/slurp-xy-map "resources/2022/day8.test.txt")) {:x 2 :y 1})
-    8 (tree-score-at (first (h/slurp-xy-map "resources/2022/day8.test.txt")) {:x 2 :y 3})
-    ))
+    8 (tree-score-at (first (h/slurp-xy-map "resources/2022/day8.test.txt")) {:x 2 :y 3})))
