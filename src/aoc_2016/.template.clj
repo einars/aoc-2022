@@ -1,9 +1,10 @@
 (ns aoc-2016.dayN
-  (:require [clojure.test :as test :refer [deftest]])
-  (:require [clojure.string :as str])
-  (:require [clojure.tools.trace :refer [trace deftrace]])
-  (:require [clojure.pprint :as pprint])
-  (:require [aoc.helpers :as h]))
+  (:require
+    [clojure.test :as test :refer [deftest]]
+    [clojure.string :as str]
+    [clojure.tools.trace :refer [trace deftrace]]
+    [clojure.pprint :as pprint]
+    [aoc.helpers :as h]))
 
 (defn solve-1
   ([] (solve-1 "resources/2016/dayN.txt"))

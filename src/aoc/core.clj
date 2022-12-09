@@ -1,19 +1,20 @@
 (ns aoc.core
-  (:require [clojure.string :as str])
-  (:require [clojure.pprint :as pprint])
+  (:require
+    [clojure.string :as str]
+    [clojure.pprint :as pprint]
 
-  (:require [aoc-2016.day1])
-  (:require [aoc-2016.day2])
+    [aoc-2016.day1]
+    [aoc-2016.day2]
 
-  (:require [aoc-2022.day1])
-  (:require [aoc-2022.day2])
-  (:require [aoc-2022.day3])
-  (:require [aoc-2022.day4])
-  (:require [aoc-2022.day5])
-  (:require [aoc-2022.day6])
-  (:require [aoc-2022.day7])
-  (:require [aoc-2022.day8])
-  (:require [aoc-2022.day9])
+    [aoc-2022.day1]
+    [aoc-2022.day2]
+    [aoc-2022.day3]
+    [aoc-2022.day4]
+    [aoc-2022.day5]
+    [aoc-2022.day6]
+    [aoc-2022.day7]
+    [aoc-2022.day8]
+    [aoc-2022.day9])
   (:gen-class))
 
 (defn solve
@@ -33,7 +34,7 @@
   [ & args]
   (if (seq args)
     (apply solve (->> (str/split (first args) #"/")
-                   (map #(Integer/parseInt %))))
+                      (map #(Integer/parseInt %))))
     (doseq [y (range 2015 2023)
             d (range 26)]
       (solve y d))))

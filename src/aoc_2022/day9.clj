@@ -1,10 +1,11 @@
 (ns aoc-2022.day9
-  (:require [clojure.test :as test :refer [deftest]])
-  (:require [clojure.set :as set])
-  (:require [clojure.string :as str])
-  (:require [clojure.tools.trace :refer [trace deftrace]])
-  (:require [clojure.pprint :as pp])
-  (:require [aoc.helpers :as h]))
+  (:require 
+    [clojure.test :as test :refer [deftest]]
+    [clojure.set :as set]
+    [clojure.string :as str]
+    [clojure.tools.trace :refer [trace deftrace]]
+    [clojure.pprint :as pp]
+    [aoc.helpers :as h]))
 
 
 ; [head tail]
@@ -60,8 +61,8 @@
   "returns full-path"
   [rope commands]
   (reduce (fn [path cmd]
-    (let [new-path (move-rope-multi (last path) cmd)]
-      (concat path new-path)))
+            (let [new-path (move-rope-multi (last path) cmd)]
+              (concat path new-path)))
     [rope] commands))
 
 (defn tail-positions

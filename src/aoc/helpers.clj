@@ -1,6 +1,7 @@
 (ns aoc.helpers
-  (:require [clojure.string :as str])
-  (:require [clojure.java.io :as io]))
+  (:require
+    [clojure.string :as str]
+    [clojure.java.io :as io]))
 
 (defn slurp-strings [file]
   (with-open [rdr (io/reader file)]
@@ -24,7 +25,7 @@
         xy-map(reduce (fn [xy elt] (into xy elt)) {} xy-maps)
         size-x (count indexed-lines)
         size-y (count (first (first indexed-lines)))]
-        [xy-map {:x size-x :y size-y}]))
+    [xy-map {:x size-x :y size-y}]))
 
 
 

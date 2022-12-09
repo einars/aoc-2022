@@ -1,9 +1,10 @@
 (ns aoc-2016.day2
-  (:require [clojure.test :as test :refer [deftest]])
-  (:require [clojure.string :as str])
-  (:require [clojure.tools.trace :as trace :refer[deftrace trace]])
-  (:require [clojure.pprint :as pprint])
-  (:require [aoc.helpers :as h]))
+  (:require 
+    [clojure.test :as test :refer [deftest]]
+    [clojure.string :as str]
+    [clojure.tools.trace :as trace :refer[deftrace trace]]
+    [clojure.pprint :as pprint]
+    [aoc.helpers :as h]))
 
 (defn tpl-get-in
   "same as get-in, but returns nil on \\space"

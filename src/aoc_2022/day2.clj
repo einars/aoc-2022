@@ -1,8 +1,9 @@
 (ns aoc-2022.day2
-  (:require [clojure.test :as test :refer [deftest]])
-  (:require [clojure.string :as str])
-  (:require [clojure.tools.trace :as trace :refer [deftrace]])
-  (:require [aoc.helpers :as h]))
+  (:require
+    [clojure.test :as test :refer [deftest]]
+    [clojure.string :as str]
+    [clojure.tools.trace :as trace :refer [deftrace]]
+    [aoc.helpers :as h]))
 
 (def shape-score {:rock 1, :paper 2, :scissors 3})
 

@@ -1,7 +1,8 @@
 (ns aoc-2022.day3
-  (:require [clojure.test :as test :refer [deftest]])
-  (:require [clojure.set :as set])
-  (:require [aoc.helpers :as h]))
+  (:require
+    [clojure.test :as test :refer [deftest]]
+    [clojure.set :as set]
+    [aoc.helpers :as h]))
 
 (defn score-of 
   [c]

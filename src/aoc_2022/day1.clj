@@ -1,6 +1,7 @@
 (ns aoc-2022.day1
-  (:require [clojure.test :as test :refer [deftest is]])
-  (:require [aoc.helpers :as h]))
+  (:require
+    [clojure.test :as test :refer [deftest is]]
+    [aoc.helpers :as h]))
 
 (defn elves-carrying
   [lines]

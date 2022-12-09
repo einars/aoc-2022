@@ -1,7 +1,7 @@
 (ns aoc-2022.day6
-  (:require [clojure.test :as test :refer [deftest]])
-  ;(:require [clojure.tools.trace :as trace])
-  (:require [aoc.helpers :as h]))
+  (:require
+    [clojure.test :as test :refer [deftest]]
+    [aoc.helpers :as h]))
 
 (defn transmission-header-idx
   [transmission len]

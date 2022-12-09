@@ -1,9 +1,10 @@
 (ns aoc-2022.day7
-  (:require [clojure.test :as test :refer [deftest]])
-  (:require [clojure.string :as str])
-  (:require [clojure.pprint :as pprint])
-  (:require [clojure.tools.trace :as t :refer [trace deftrace]])
-  (:require [aoc.helpers :as h]))
+  (:require
+    [clojure.test :as test :refer [deftest]]
+    [clojure.string :as str]
+    [clojure.pprint :as pprint]
+    [clojure.tools.trace :as t :refer [trace deftrace]]
+    [aoc.helpers :as h]))
 
 (def blank-hdd
   {:pwd []

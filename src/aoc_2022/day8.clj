@@ -1,10 +1,11 @@
 (ns aoc-2022.day8
-  (:require [clojure.test :as test :refer [deftest]])
-  (:require [clojure.set :as set])
-  (:require [clojure.string :as str])
-  (:require [clojure.tools.trace :refer [trace deftrace]])
-  (:require [clojure.pprint :as pprint])
-  (:require [aoc.helpers :as h]))
+  (:require
+    [clojure.test :as test :refer [deftest]]
+    [clojure.set :as set]
+    [clojure.string :as str]
+    [clojure.tools.trace :refer [trace deftrace]]
+    [clojure.pprint :as pprint]
+    [aoc.helpers :as h]))
 
 ;; part 1
 
