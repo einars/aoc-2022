@@ -57,12 +57,12 @@
         (recur new-rope (dec amount) (conj acc new-rope))))))
 
 (defn run-with-commands
-  "returns [end-rope full-path]"
+  "returns full-path"
   [rope commands]
-  (reduce (fn [[r, path] cmd]
-            (let [new-path (move-rope-multi r cmd)]
-              [(last new-path) (concat path new-path)]))
-    [rope, [rope]] commands))
+  (reduce (fn [path cmd]
+    (let [new-path (move-rope-multi (last path) cmd)]
+      (concat path new-path)))
+    [rope] commands))
 
 (defn tail-positions
   [path]
@@ -79,7 +79,6 @@
      (h/slurp-strings file)
      (map parse-command)
      (run-with-commands blank-rope)
-     second
      tail-positions
      count)))
 
@@ -90,7 +89,6 @@
      (h/slurp-strings file)
      (map parse-command)
      (run-with-commands blank-rope-pt2)
-     second
      tail-positions
      count)))
 
@@ -99,9 +97,9 @@
     false (should-tail-move? {:x 0 :y 0} {:x 0 :y 0})
     false (should-tail-move? {:x 0 :y 0} {:x 0 :y 1})
     true (should-tail-move? {:x 0 :y 0} {:x 0 :y 2})
-    [{:x 4 :y 0} {:x 3 :y 0}] (first (run-with-commands blank-rope [[\R 4]]))
-    [{:x 4 :y 4} {:x 4 :y 3}] (first (run-with-commands blank-rope [[\R 4] [\U 4]]))
-    [{:x 1 :y 4} {:x 2 :y 4}] (first (run-with-commands blank-rope [[\R 4] [\U 4] [\L 3]]))
+    [{:x 4 :y 0} {:x 3 :y 0}] (last (run-with-commands blank-rope [[\R 4]]))
+    [{:x 4 :y 4} {:x 4 :y 3}] (last (run-with-commands blank-rope [[\R 4] [\U 4]]))
+    [{:x 1 :y 4} {:x 2 :y 4}] (last (run-with-commands blank-rope [[\R 4] [\U 4] [\L 3]]))
     13 (solve-1 "resources/2022/day9.test.txt")
     1 (solve-2 "resources/2022/day9.test.txt")
     36 (solve-2 "resources/2022/day9.test2.txt")
