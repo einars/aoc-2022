@@ -28,7 +28,7 @@
 
 (defn adjust-tail 
   [head tail]
-  (if (not (should-tail-move? head tail))
+  (if-not (should-tail-move? head tail)
     tail
     (-> tail
       (update :x #(cond
