@@ -32,13 +32,13 @@
     tail
     (-> tail
       (update :x #(cond
-        (= % (head :x)) %
-        (> % (head :x)) (dec %)
-        (< % (head :x)) (inc %)))
+                    (= % (head :x)) %
+                    (> % (head :x)) (dec %)
+                    (< % (head :x)) (inc %)))
       (update :y #(cond
-        (= % (head :y)) %
-        (> % (head :y)) (dec %)
-        (< % (head :y)) (inc %))))))
+                    (= % (head :y)) %
+                    (> % (head :y)) (dec %)
+                    (< % (head :y)) (inc %))))))
 
 (defn move-rope [rope dir]
   (let [delta (directions dir)
@@ -90,9 +90,9 @@
      (h/slurp-strings file)
      (map parse-command)
      (run-with-commands blank-rope-pt2)
-   second
-   tail-positions
-   count)))
+     second
+     tail-positions
+     count)))
 
 (deftest test-stuff [] 
   (test/are [x y] (= x y)
