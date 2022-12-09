@@ -8,41 +8,35 @@
 
 
 ; [head tail]
-(def blank-rope [{:x 0 :y 0}, {:x 0 :y 0}])
-(def blank-rope-pt2 (repeat 10 {:x 0 :y 0}))
+(def blank-rope (repeat 2 [0 0]))
+(def blank-rope-pt2 (repeat 10 [0 0]))
 
 (def directions 
-  {\U {:dy +1}
-   \D {:dy -1}
-   \L {:dx -1}
-   \R {:dx +1}})
+  {\U [0 +1]
+   \D [0 -1]
+   \L [-1 0]
+   \R [+1 0]})
 
-(defn apply-direction [{:keys [x y]} {:keys [dx dy]}]
-  {:x (+ x (or dx 0))
-   :y (+ y (or dy 0))})
+(def head [0 0])
+(def tail [0 0])
 
-(defn should-tail-move? 
-  [head tail]
-  (or (> (abs (- (:x head) (:x tail))) 1)
-    (> (abs (- (:y head) (:y tail))) 1)))
+(defn sign [n]
+  (cond
+    (< n 0) -1
+    (> n 0) +1
+    :else 0))
 
 (defn adjust-tail 
   [head tail]
-  (if-not (should-tail-move? head tail)
+  (if-not (some #(> % 1) (map abs (map - head tail)))
     tail
-    (-> tail
-      (update :x #(cond
-                    (= % (head :x)) %
-                    (> % (head :x)) (dec %)
-                    (< % (head :x)) (inc %)))
-      (update :y #(cond
-                    (= % (head :y)) %
-                    (> % (head :y)) (dec %)
-                    (< % (head :y)) (inc %))))))
+    (->>
+      (map - head tail) 
+      (map sign)
+      (map + tail))))
 
 (defn move-rope [rope dir]
-  (let [delta (directions dir)
-        new-head (apply-direction (first rope) delta)]
+  (let [new-head (map + (first rope) (directions dir))]
     (reduce (fn [acc this-tail] (conj acc (adjust-tail (last acc) this-tail)))
       [new-head]
       (rest rope))))
@@ -59,10 +53,10 @@
 (defn run-with-commands
   "returns full-path"
   [rope commands]
-  (reduce (fn [path cmd]
-    (let [new-path (move-rope-multi (last path) cmd)]
-      (concat path new-path)))
-    [rope] commands))
+  (reduce 
+    (fn [path cmd] (concat path (move-rope-multi (last path) cmd)))
+    [rope]
+    commands))
 
 (defn tail-positions
   [path]
@@ -94,12 +88,9 @@
 
 (deftest test-stuff [] 
   (test/are [x y] (= x y)
-    false (should-tail-move? {:x 0 :y 0} {:x 0 :y 0})
-    false (should-tail-move? {:x 0 :y 0} {:x 0 :y 1})
-    true (should-tail-move? {:x 0 :y 0} {:x 0 :y 2})
-    [{:x 4 :y 0} {:x 3 :y 0}] (last (run-with-commands blank-rope [[\R 4]]))
-    [{:x 4 :y 4} {:x 4 :y 3}] (last (run-with-commands blank-rope [[\R 4] [\U 4]]))
-    [{:x 1 :y 4} {:x 2 :y 4}] (last (run-with-commands blank-rope [[\R 4] [\U 4] [\L 3]]))
+    [[4 0] [3 0]] (last (run-with-commands blank-rope [[\R 4]]))
+    [[4 4] [4 3]] (last (run-with-commands blank-rope [[\R 4] [\U 4]]))
+    [[1 4] [2 4]] (last (run-with-commands blank-rope [[\R 4] [\U 4] [\L 3]]))
     13 (solve-1 "resources/2022/day9.test.txt")
     1 (solve-2 "resources/2022/day9.test.txt")
     36 (solve-2 "resources/2022/day9.test2.txt")
