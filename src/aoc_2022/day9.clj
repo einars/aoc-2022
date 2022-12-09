@@ -9,6 +9,7 @@
 
 ; [head tail]
 (def blank-rope [{:x 0 :y 0}, {:x 0 :y 0}])
+(def blank-rope-pt2 (repeat 10 {:x 0 :y 0}))
 
 (def directions 
   {\U {:dy +1}
@@ -26,15 +27,25 @@
     (> (abs (- (:y head) (:y tail))) 1)))
 
 (defn adjust-tail 
-  [tail head {:keys [dx dy]}]
-  {:x (if (nil? dy) (tail :x) (head :x)) ; move left-right - stay on same line with head
-   :y (if (nil? dx) (tail :y) (head :y))}) ; moved up-down - stay on column with head
+  [head tail]
+  (if (not (should-tail-move? head tail))
+    tail
+    (-> tail
+      (update :x #(cond
+        (= % (head :x)) %
+        (> % (head :x)) (dec %)
+        (< % (head :x)) (inc %)))
+      (update :y #(cond
+        (= % (head :y)) %
+        (> % (head :y)) (dec %)
+        (< % (head :y)) (inc %))))))
 
-(defn move-rope [[head tail] dir]
+(defn move-rope [rope dir]
   (let [delta (directions dir)
-        new-head (apply-direction head delta)
-        new-tail (if (should-tail-move? new-head tail) (adjust-tail (apply-direction tail delta) head delta) tail)]
-    [new-head new-tail]))
+        new-head (apply-direction (first rope) delta)]
+    (reduce (fn [acc this-tail] (conj acc (adjust-tail (last acc) this-tail)))
+      [new-head]
+      (rest rope))))
 
 
 (defn move-rope-multi 
@@ -55,7 +66,7 @@
 
 (defn tail-positions
   [path]
-  (set (map second path)))
+  (set (map last path)))
 
 (defn parse-command
   [cmd]
@@ -72,6 +83,16 @@
      tail-positions
      count)))
 
+(defn solve-2
+  ([] (solve-2 "resources/2022/day9.txt"))
+  ([file]
+   (->>
+     (h/slurp-strings file)
+     (map parse-command)
+     (run-with-commands blank-rope-pt2)
+   second
+   tail-positions
+   count)))
 
 (deftest test-stuff [] 
   (test/are [x y] (= x y)
@@ -82,5 +103,6 @@
     [{:x 4 :y 4} {:x 4 :y 3}] (first (run-with-commands blank-rope [[\R 4] [\U 4]]))
     [{:x 1 :y 4} {:x 2 :y 4}] (first (run-with-commands blank-rope [[\R 4] [\U 4] [\L 3]]))
     13 (solve-1 "resources/2022/day9.test.txt")
-    ; 0 (solve-2 "resources/2022/day9.test.txt")
+    1 (solve-2 "resources/2022/day9.test.txt")
+    36 (solve-2 "resources/2022/day9.test2.txt")
     ))
