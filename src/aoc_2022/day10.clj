@@ -31,6 +31,10 @@
   [[clock _state]]
   (zero? (mod (- clock 20) 40)))
 
+(defn convert-to-pixel
+  [[clock {:keys [:x]} ]]
+  (let [pixel (mod (dec clock) 40)]
+    (if (or (= pixel x) (= pixel (inc x)) (= pixel (dec x))) "#" ".")))
 
 
 (defn signal-strength [[clock state]] (* clock (:x state)))
@@ -38,13 +42,30 @@
 (defn solve-1
   ([] (solve-1 "resources/2022/day10.txt"))
   ([file]
-     (->>
-       (h/slurp-strings file)
-       (map parse-command)
-       (run-commands initial-state)
-       (filter interesting-state?)
-       (map signal-strength)
-       (reduce +))))
+   (->>
+     (h/slurp-strings file)
+     (map parse-command)
+     (run-commands initial-state)
+     (filter interesting-state?)
+     (map signal-strength)
+     (reduce +))))
+
+
+(defn output [pixel-lines]
+  (println)
+  (run! println pixel-lines))
+
+(defn solve-2
+  ([] (solve-2 "resources/2022/day10.txt"))
+  ([file]
+   (->>
+     (h/slurp-strings file)
+     (map parse-command)
+     (run-commands initial-state)
+     (map convert-to-pixel)
+     (partition 40)
+     (map str/join)
+     output)))
 
 (def sample 
   [(parse-command "noop")
@@ -54,5 +75,6 @@
 
 (deftest test-stuff [] 
   (test/are [x y] (= x y)
-     13140 (solve-1 "resources/2022/day10.test.txt")
+    13140 (solve-1 "resources/2022/day10.test.txt")
+    ; (solve-2 "resources/2022/day10.test.txt")
     ))
