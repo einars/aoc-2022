@@ -29,10 +29,11 @@
    :items (parse-numbers (second block))
    :div-test (parse-number (nth block 3))
    :operation (parse-operation (nth block 2) )
-   :test (parse-test (nthnext block 3))})
+   :test (parse-test (nthnext block 3))
+   :n 0})
 
 
-(def ^:dynamic *worry-fn* #(int (/ % 3)))
+(def ^:dynamic *worry-fn* #(quot % 3))
 
 (defn play-single-throw
   [monkey monkeys item]
@@ -56,15 +57,14 @@
        (recur (rest ids) new-monkeys))
      monkeys)))
 
- (defn prepare-monkey [m] [(:id m) (assoc m :n 0)])
-
 (defn solve-1
   ([] (solve-1 "resources/2022/day11.txt"))
   ([file]
    (let [monks (->> file
                  (h/slurp-blocks)
                  (map parse)
-                 (map prepare-monkey)
+                 ; build assoc-map monkey-id -> monkey
+                 (map (fn [m] [(:id m) m]))
                  (into {}))]
      (->> (nth (iterate play-round monks) 20)
        (vals)
@@ -79,7 +79,7 @@
    (let [monks (->> file
                  (h/slurp-blocks)
                  (map parse)
-                 (map prepare-monkey)
+                 (map (fn [m] [(:id m) m]))
                  (into {}))
          div-test (reduce * (map :div-test (vals monks)))]
      (binding [*worry-fn* #(mod % div-test)]
