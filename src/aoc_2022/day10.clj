@@ -14,7 +14,7 @@
         cmd (first split)]
     (cond
       (= cmd "noop") [0 identity]
-      (= cmd "addx") [1 #(update % :x (partial + (Integer/parseInt (second split))))]) ) )
+      (= cmd "addx") [1 #(update % :x (partial + (Integer/parseInt (second split))))])))
 
 (defn run-commands 
   ([state commands] (run-commands state (rest commands) 1 (first commands) []))
@@ -22,8 +22,8 @@
 
    (cond
      (nil? cmd) accu
-     (zero? (first cmd)) (recur ((second cmd) state) (rest commands) (inc clock) (first commands)                  (conj accu [clock state]))
-     :else               (recur state                commands         (inc clock) [(dec (first cmd)) (second cmd)] (conj accu [clock state])))))
+     (zero? (first cmd)) (recur ((second cmd) state) (rest commands) (inc clock) (first commands)                 (conj accu [clock state]))
+     :else               (recur state                commands        (inc clock) [(dec (first cmd)) (second cmd)] (conj accu [clock state])))))
 
 
 (defn interesting-state? 
