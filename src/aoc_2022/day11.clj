@@ -1,10 +1,6 @@
 (ns aoc-2022.day11
   (:require
     [clojure.test :as test :refer [deftest]]
-    [clojure.set :as set]
-    [clojure.string :as str]
-    [clojure.tools.trace :refer [trace deftrace]]
-    [clojure.pprint :as pp]
     [aoc.helpers :as h]))
 
 (defn parse-numbers 
@@ -31,18 +27,16 @@
   [block]
   {:id (parse-number (first block))
    :items (parse-numbers (second block))
-   :operation (parse-operation (nth block 2))
+   :div-test (parse-number (nth block 3))
+   :operation (parse-operation (nth block 2) )
    :test (parse-test (nthnext block 3))})
 
-(defn prepare-monkey 
-  [m] 
-  [(:id m)
-   (assoc m :n 0)])
+
+(def ^:dynamic *worry-fn* #(int (/ % 3)))
 
 (defn play-single-throw
   [monkey monkeys item]
-  (let [
-        new-level (int (/ ((:operation monkey) item) 3))
+  (let [new-level (*worry-fn* ((:operation monkey) item))
         new-monkey ((:test monkey) new-level)]
     ; (prn (:id monkey) "inspects" item "new-level" new-level "thrown to" new-monkey )
     (-> monkeys
@@ -54,12 +48,15 @@
   "Assumes that the monkey won't throw to himself"
   ([monkeys] (play-round (keys monkeys) monkeys))
   ([ids monkeys]
+
    (if (seq ids)
      (let [monkey-id (first ids)
            monkey (monkeys monkey-id)
            new-monkeys (reduce (fn [all-monkeys item] (play-single-throw monkey all-monkeys item)) monkeys (:items monkey))]
        (recur (rest ids) new-monkeys))
      monkeys)))
+
+ (defn prepare-monkey [m] [(:id m) (assoc m :n 0)])
 
 (defn solve-1
   ([] (solve-1 "resources/2022/day11.txt"))
@@ -76,13 +73,24 @@
        (take 2)
        (reduce *)))))
 
-(def monks (->> "resources/2022/day11.test.txt"
-             (h/slurp-blocks)
-             (map parse)
-             (map prepare-monkey)
-             (into {})))
+(defn solve-2 
+  ([] (solve-2 "resources/2022/day11.txt"))
+  ([file]
+   (let [monks (->> file
+                 (h/slurp-blocks)
+                 (map parse)
+                 (map prepare-monkey)
+                 (into {}))
+         div-test (reduce * (map :div-test (vals monks)))]
+     (binding [*worry-fn* #(mod % div-test)]
+       (->> (nth (iterate play-round monks) 10000)
+         (vals)
+         (map :n)
+         (sort >)
+         (take 2)
+         (reduce *))))))
 
 (deftest test-stuff [] 
   (test/are [x y] (= x y)
-    [101 95 7 105] (map :n (vals (nth (iterate play-round monks) 20)))
-    10605 (solve-1 "resources/2022/day11.test.txt")))
+    10605 (solve-1 "resources/2022/day11.test.txt")
+    2713310158 (solve-2 "resources/2022/day11.test.txt")))
