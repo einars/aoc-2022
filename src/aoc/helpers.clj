@@ -32,3 +32,9 @@
 (defn slurp-ints [file]
   (mapv #(Integer/parseInt %) (slurp-strings file)))
 
+(defn find-keys [pred m]
+  (map first (filter (fn [[_k v]] (pred v)) m)))
+
+(defn find-vals [pred m]
+  (map second (filter (fn [[_k v]] (pred v)) m)))
+
