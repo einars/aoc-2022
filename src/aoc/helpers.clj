@@ -27,7 +27,7 @@
         size-y (count (first (first indexed-lines)))]
     [xy-map {:x size-x :y size-y}]))
 
-
+(defn zip [& xs] (apply map vector xs))
 
 (defn slurp-ints [file]
   (mapv #(Integer/parseInt %) (slurp-strings file)))
