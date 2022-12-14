@@ -6,6 +6,7 @@
     [io.github.humbleui.paint :as paint]
     [io.github.humbleui.ui :as ui]
     [io.github.humbleui.window :as window]
+    [clojure.set :as set]
     [nrepl.cmdline :as nrepl]))
 
 (defonce *window (atom nil))
@@ -30,6 +31,17 @@
    })
 
 (def step-1 (partial iterate tower/iterate-1))
+(defn step-2 [t]
+  (let [next-t (tower/iterate-until-settled-1 t)
+        new-sand (set/difference (:sand next-t) (:sand t))
+        ]
+        (if-let [[sx sy] (first new-sand)]
+          (if (and (= 1 (count new-sand)) (or ((:sand t) [(dec sx) (inc sy)])
+            ((:sand t) [(inc sx) (inc sy)])))
+            (recur next-t)
+            next-t)
+          next-t)))
+
 
 (defn paint-canvas [ctx canvas size]
 
@@ -41,7 +53,8 @@
       (binding [tower/*floating-pos* (if (:floor @*tower) (+ 3 height) height)
                 tower/*floor-pos* (when (:floor @*tower) (+ 2 height))]
         ;(swap! *tower tower/iterate-until-settled-1)
-        (swap! *tower #(nth (step-1 %) 9))
+        (swap! *tower step-2)
+        ;(swap! *tower #(nth (step-1 %) 9))
         ))
 
 
@@ -110,6 +123,7 @@
   (toggle-run)
 
   (:walls @*tower)
+  (:sand @*tower)
   (-main))
 
 
