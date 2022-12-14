@@ -18,7 +18,8 @@
     [aoc-2022.day10]
     [aoc-2022.day11]
     [aoc-2022.day12]
-    [aoc-2022.day13])
+    [aoc-2022.day13]
+    [aoc-2022.day14])
   (:gen-class))
 
 (defn solve
@@ -29,9 +30,9 @@
         solve-2 (fns 'solve-2)]
 
     (when solve-1
-      (printf "%d/%d part 1 = %s" year day (with-out-str (pprint/pprint (solve-1)))))
+      (printf "%d/%d part 1 = %s" year day (pprint/pprint (solve-1))))
     (when solve-2
-      (printf "%d/%d part 2 = %s" year day (with-out-str (pprint/pprint (solve-2)))))))
+      (printf "%d/%d part 2 = %s" year day (pprint/pprint (solve-2))))))
 
 (defn -main
   "Run all AOC tasks"
