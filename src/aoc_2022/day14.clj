@@ -26,6 +26,7 @@
                     [x y])))))
 
 (def ^:dynamic *floating-pos* 10)
+(def ^:dynamic *floor-pos* nil)
 
 (defn next-move
   [s walls sand]
@@ -35,6 +36,7 @@
         dr [(inc x) (inc y)]]
     (cond
       (= y *floating-pos*) (throw (Exception. "boom"))
+      (= (inc y) *floor-pos*) nil
       (not (or (walls d) (sand d))) d
       (not (or (walls dl) (sand dl))) dl
       (not (or (walls dr) (sand dr))) dr
@@ -42,12 +44,11 @@
 
 
 (defn settle
-  [walls sand]
-  (let [moved-sand (keep #(next-move % walls sand) sand)
-        new-sand (into #{} (map #(or (next-move % walls sand) %) sand))]
-    (cond
-      (empty? moved-sand) sand ; settled
-      :else (recur walls new-sand))))
+  [walls sand grain]
+  (let [new-grain (next-move grain walls sand)]
+    (if (nil? new-grain) 
+      (conj sand grain)
+      (recur walls sand new-grain))))
 
 (defn parse-line [s]
   (reduce #(trace-line %1 (make-pair %2)) [] (str/split s #" -> ")))
@@ -56,23 +57,32 @@
   (first (sort > (map second walls))))
 
 (defn iterate-until-settled 
-  ([walls] (prn "iterate!") (iterate-until-settled walls #{}))
+  ([walls] (iterate-until-settled walls #{}))
   ([walls sand]
-    (printf ".")
-    (flush)
-    (if-let [new-sand (try (settle walls (conj sand [500 0])) (catch Exception _ nil))]
-     (recur walls new-sand)
+   (flush)
+   (if-let [new-sand (try (settle walls sand [500 0]) (catch Exception _ nil))]
+     (if (sand [500 0])
+       sand
+       (recur walls new-sand))
      sand)))
 
 (defn solve-1
   ([] (solve-1 "resources/2022/day14.txt"))
   ([file]
    (let [walls (into #{} (mapcat parse-line (h/slurp-strings file)))]
-     (binding [*floating-pos* (floating-pos walls)]
+     (binding [*floating-pos* (floating-pos walls)
+               *floor-pos* nil]
        (count (iterate-until-settled walls))))))
 
+(defn solve-2
+  ([] (solve-2 "resources/2022/day14.txt"))
+  ([file]
+   (let [walls (into #{} (mapcat parse-line (h/slurp-strings file)))]
+     (binding [*floating-pos* nil
+               *floor-pos* (+ 2 (floating-pos walls))]
+       (count (iterate-until-settled walls))))))
 
 (deftest test-stuff [] 
   (test/are [x y] (= x y)
     24 (solve-1 "resources/2022/day14.test.txt")
-    ))
+    93 (solve-2 "resources/2022/day14.test.txt")))
