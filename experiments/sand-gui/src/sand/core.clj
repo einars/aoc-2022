@@ -53,8 +53,8 @@
       (binding [tower/*floating-pos* (if (:floor @*tower) (+ 3 height) height)
                 tower/*floor-pos* (when (:floor @*tower) (+ 2 height))]
         ;(swap! *tower tower/iterate-until-settled-1)
-        (swap! *tower step-2)
-        ;(swap! *tower #(nth (step-1 %) 9))
+        ;(swap! *tower step-2)
+        (swap! *tower #(nth (step-1 %) 10))
         ))
 
 

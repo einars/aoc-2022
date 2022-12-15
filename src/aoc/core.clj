@@ -19,7 +19,8 @@
     [aoc-2022.day11]
     [aoc-2022.day12]
     [aoc-2022.day13]
-    [aoc-2022.day14])
+    [aoc-2022.day14]
+    [aoc-2022.day15])
   (:gen-class))
 
 (defn solve
