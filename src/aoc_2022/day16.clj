@@ -5,6 +5,7 @@
     [clojure.string :as str]
     [clojure.tools.trace :refer [trace deftrace]]
     [clojure.pprint :as pp]
+    [clojure.math.combinatorics :as combo]
     [aoc.helpers :as h]))
 
 (defn parse [l]
@@ -21,11 +22,21 @@
 
 (def max-pressure (atom 0))
 
-(defn consider [pressure path]
+(def ^:dynamic *stfu* false)
+(defn consider [pressure]
   (when (> pressure @max-pressure)
-    (printf "I can get to %d psi\n" pressure)
-    (flush)
+    (when-not *stfu* 
+      (printf "I can get to %d psi\n" pressure)
+      (flush))
     (reset! max-pressure pressure)))
+
+(def max-pressure-pt2 (atom 0))
+
+(defn consider-2 [pressure extra]
+  (when (> pressure @max-pressure-pt2)
+    (printf "PT2 I can get to %d psi %s\n" pressure extra)
+    (flush)
+    (reset! max-pressure-pt2 pressure)))
 
 (defn build-distances
   [valves]
@@ -53,34 +64,71 @@
 
 ;(build-distances valves)
 
+(def ^:dynamic *time* 30)
+
 (defn find-max 
-  [valves loc step pressure path]
+  ([valves]
+   (reset! max-pressure 0)
+   (find-max valves :AA 1 0 #{}))
+  ([valves avoid]
+   (reset! max-pressure 0)
+   (find-max valves :AA 1 0 (set avoid)))
+  ([valves loc step pressure avoid]
 
-  (consider (+ pressure (* (pressure-delta valves) (- 31 step))) path)
+   (consider (+ pressure (* (pressure-delta valves) (- (inc *time*) step))))
 
-  (let [targets (map :valve (filter #(false? (:open %)) (vals valves)))]
+   (let [targets (map :valve (filter #(false? (:open %)) (vals valves)))
+         targets (filter #(not (avoid %)) targets)]
 
-    (doseq [t targets]
-      (let [distance (get-in valves [loc :distances t])
-            distance (inc distance) ; move + close
-            new-valves (assoc-in valves [t :open] true)]
-        (when (<= (+ step distance) 30)
-          (find-max new-valves t (+ step distance) (+ pressure (* distance (pressure-delta valves))) (conj path [step :dist distance :p pressure loc :move-to t])))))))
+     (doseq [t targets]
+       (let [distance (get-in valves [loc :distances t])
+             distance (inc distance) ; move + close
+             new-valves (assoc-in valves [t :open] true)]
+         (when (<= (+ step distance) *time*)
+           (find-max new-valves t (+ step distance) (+ pressure (* distance (pressure-delta valves))) avoid)))))))
+
+(defn find-max-2
+  [valves]
+
+  (reset! max-pressure-pt2 0)
+
+  (binding [*time* 26
+            *stfu* true]
+    (doseq [[a b] (combo/partitions (map :valve (filter #(false? (:open %)) (vals valves))) :min 2 :max 2)]
+      (let [_ (find-max valves a)
+            ra @max-pressure
+            _ (find-max valves b)
+            rb @max-pressure]
+        (consider-2 (+ ra rb) [a b])))))
+
 
 (defn solve-1
   ([] (solve-1 "resources/2022/day16.txt"))
   ([file]
-   (reset! max-pressure 0)
    (let [valves (->> file
                   (h/slurp-strings)
                   (map parse)
                   (into {})
                   (build-distances))]
-     (find-max valves :AA 1 0 [])
+     (find-max valves)
      @max-pressure)))
+
+(defn solve-2
+  ([] "Very slow. Run manually from the repl!")
+  ([file]
+   (let [valves (->> file
+                  (h/slurp-strings)
+                  (map parse)
+                  (into {})
+                  (build-distances))]
+     (find-max-2 valves)
+     @max-pressure-pt2)))
 
 (deftest test-stuff [] 
   (test/are [x y] (= x y)
     true false
     1651 (solve-1 "resources/2022/day16.test.txt")
-    ))
+    1707 (solve-2 "resources/2022/day16.test.txt")))
+
+(comment
+  (solve-2 "resources/2022/day16.txt"))
