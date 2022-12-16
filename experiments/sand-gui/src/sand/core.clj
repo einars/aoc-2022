@@ -115,8 +115,8 @@
 
 (comment
   (load-tower nil)
-  (load-tower "/proj/aoc/aoc-2022/resources/2022/day14.test.txt")
-  (load-tower "/proj/aoc/aoc-2022/resources/2022/day14.txt")
+  (load-tower "/proj/aoc/resources/2022/day14.test.txt")
+  (load-tower "/proj/aoc/resources/2022/day14.txt")
 
 
   (toggle-floor)

@@ -20,7 +20,8 @@
     [aoc-2022.day12]
     [aoc-2022.day13]
     [aoc-2022.day14]
-    [aoc-2022.day15])
+    [aoc-2022.day15]
+    [aoc-2022.day16])
   (:gen-class))
 
 (defn solve
@@ -41,7 +42,7 @@
   [ & args]
   (if (seq args)
     (apply solve (->> (str/split (first args) #"/")
-                      (map #(Integer/parseInt %))))
+                   (map #(Integer/parseInt %))))
     (doseq [y (range 2015 2023)
             d (range 26)]
       (solve y d))))
