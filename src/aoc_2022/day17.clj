@@ -101,12 +101,13 @@
     (reduce find-loop [initial-board figures indexed-moveset] (range))))
 
 (defn get-height [figures moveset n]
-  (if-let [[start-loop loop-len height-delta] (detect-loop figures moveset)]
-    (let [n-loops-skipped (quot (- n start-loop) loop-len)
-          new-n (- n (* n-loops-skipped loop-len))]
-      (+ (* n-loops-skipped height-delta)
-        (:height (first (nth (iterate place-fig [initial-board figures (cycle moveset)]) new-n)))))
-    (:height (first (nth (iterate place-fig [initial-board figures (cycle moveset)]) n)))))
+  (let [game-stream (iterate place-fig [initial-board figures (cycle moveset)])]
+    (if-let [[_ loop-len height-delta] (detect-loop figures moveset)]
+      (let [n-loops (quot n loop-len)
+            new-n (mod n loop-len)]
+        (+ (:height (first (nth game-stream new-n)))
+          (* n-loops height-delta)))
+      (:height (first (nth game-stream n))))))
 
 
 (defn solve-1
