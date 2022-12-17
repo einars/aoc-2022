@@ -88,12 +88,10 @@
 
           (let [side-fig-at (move-fig fig-at move)
                 side-fig-at (if (may-place board figure side-fig-at) side-fig-at fig-at)
-                dn-fig-at [(first side-fig-at) (dec (second side-fig-at))]
-                ]
+                dn-fig-at [(first side-fig-at) (dec (second side-fig-at))]]
             (if (may-place board figure dn-fig-at)
               (recur rest-moves dn-fig-at)
-              [(materialize board figure side-fig-at) rest-figs rest-moves]
-              )))))))
+              [(materialize board figure side-fig-at) rest-figs rest-moves])))))))
 
 
 
@@ -104,10 +102,10 @@
 
 (defn get-height [figures moveset n]
   (if-let [[start-loop loop-len height-delta] (detect-loop figures moveset)]
-    (let [
-          n-loops-skipped (quot (- n start-loop) loop-len)
+    (let [n-loops-skipped (quot (- n start-loop) loop-len)
           new-n (- n (* n-loops-skipped loop-len))]
-      (+ (* n-loops-skipped height-delta) (:height (first (nth (iterate place-fig [initial-board figures (cycle moveset)]) new-n)))))
+      (+ (* n-loops-skipped height-delta)
+        (:height (first (nth (iterate place-fig [initial-board figures (cycle moveset)]) new-n)))))
     (:height (first (nth (iterate place-fig [initial-board figures (cycle moveset)]) n)))))
 
 
@@ -122,7 +120,6 @@
   ([file]
    (let [moveset (str/trim (slurp file))]
      (get-height figures moveset 1000000000000))))
-
 
 (deftest test-stuff [] 
   (test/are [x y] (= x y)

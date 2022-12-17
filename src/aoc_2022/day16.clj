@@ -126,7 +126,6 @@
 
 (deftest test-stuff [] 
   (test/are [x y] (= x y)
-    true false
     1651 (solve-1 "resources/2022/day16.test.txt")
     1707 (solve-2 "resources/2022/day16.test.txt")))
 
