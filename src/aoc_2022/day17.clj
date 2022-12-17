@@ -16,14 +16,14 @@
      [[0 0] [0 1] [0 2] [0 3]]
      [[0 0] [0 1] [1 0] [1 1]]]))
 
-(def initial-board #{})
+(def initial-board {:board #{} :height 0})
 
 (defn move-fig [[x y] move]
   (condp = move
     \> [(inc x) y]
     \< [(dec x) y]))
 
-(defn may-place [board fig [x y]]
+(defn may-place [{:keys [board]} fig [x y]]
 
   (not (some (fn [[fx fy]]
                (let [tx (+ x fx)
@@ -34,14 +34,15 @@
                    (board [tx ty])))) fig)))
 
 (defn materialize [board figure [x y]]
-  (reduce conj board (map (fn [[fx fy]] [(+ x fx) (+ y fy)]) figure)))
-
-(defn calc-height [board] (or (first (sort > (map (comp inc second) board))) 0))
+  (let [moved-fig (map (fn [[fx fy]] [(+ x fx) (+ y fy)]) figure)]
+    (-> board
+      (update :board #(reduce conj % moved-fig))
+      (update :height #(max % (first (sort > (map (comp inc second) moved-fig))))))))
 
 (defn place-fig [[board [figure & rest-figs] moveset]]
 
   (let [fig-x 2
-        fig-y (+ 3 (calc-height board))]
+        fig-y (+ 3 (board :height))]
     (loop [[move & rest-moves] moveset 
            fig-at [fig-x fig-y]]
 
@@ -59,7 +60,7 @@
   ([] (solve-1 "resources/2022/day17.txt"))
   ([file]
    (let [moveset (cycle (str/trim (slurp file)))]
-     (calc-height (first (nth (iterate place-fig [initial-board figures moveset]) 2022))))))
+     (:height (first (nth (iterate place-fig [initial-board figures moveset]) 2022))))))
 
 ;(solve-1 "resources/2022/day17.test.txt")
 
