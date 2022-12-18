@@ -26,19 +26,8 @@
     (mapv + pt [dx dy dz])))
 
 
-(defn count-open-sides 
-  [lava c]
-  (apply + (map #(if (lava %) 0 1) (immediate-neighbors c))))
-
-(defn count-crusty-sides 
-  [crust c]
-  (apply + (map #(if (crust %) 1 0) (immediate-neighbors c))))
-
 (defn count-all-open-sides [lava]
-  (reduce + (map #(count-open-sides lava %) lava)))
-
-(defn count-all-crusty-sides [lava crust]
-  (reduce + (map #(count-crusty-sides crust %) lava)))
+  (count (mapcat #(filter (complement lava) (immediate-neighbors %)) lava)))
 
 (defn build-crust 
   [first-crust lava]
@@ -59,7 +48,7 @@
   (let [leftmost (first (sort-by first lava))
         first-crust (mapv - leftmost [1 0 0])
         crust (build-crust first-crust lava)]
-    (count-all-crusty-sides lava crust)))
+    (count (mapcat #(filter crust (immediate-neighbors %)) lava))))
 
 (defn solve-1
   ([] (solve-1 "resources/2022/day18.txt"))
