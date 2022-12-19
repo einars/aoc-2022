@@ -166,12 +166,18 @@
   (best-geodes-f (second (first test-geodes)) 24)
   (best-geodes (second (second test-geodes)) 24)
   (best-geodes-f (second (nth prod-geodes 28)) 24)
+
+  (best-geodes-f (second (first test-geodes)) 32)
   )
 
 
 (defn get-quality-level [[bp-id blueprints]]
   (prn bp-id)
   (* bp-id (best-geodes-f blueprints 24)))
+
+(defn get-best-pt2 [[bp-id blueprints]]
+  (prn bp-id)
+  (best-geodes-f blueprints 32))
 
 (defn solve-1
   ([] (solve-1 "resources/2022/day19.txt"))
@@ -182,22 +188,23 @@
      (map get-quality-level)
      (reduce +))))
 
+(defn solve-2
+  ([] (solve-2 "resources/2022/day19.txt"))
+  ([file]
+   (->>
+     (h/slurp-strings file)
+     (take 3)
+     (map parse-blueprint)
+     (map get-best-pt2)
+     (reduce *))))
 
 (def test-geodes (map parse-blueprint (h/slurp-strings "resources/2022/day19.test.txt")))
 (def prod-geodes (map parse-blueprint (h/slurp-strings "resources/2022/day19.txt")))
-;(solve-1)
-;(solve-1 "resources/2022/day19.test.txt")
 
-
-;(->
-;  "Blueprint 2: Each ore robot costs 3 ore. Each clay robot costs 4 ore. Each obsidian robot costs 4 ore and 19 clay. Each geode robot costs 4 ore and 11 obsidian."
-;  parse-blueprint
-;  (best-geodes 24))
+;(solve-2)
 
 (deftest test-stuff [] 
   (test/are [x y] (= x y)
-    [1 {:foo {:bar 2} :bar {:foo 1, :baz 12}}] (parse-blueprint "Blueprint 1: Each foo robot costs 2 bar. Each bar robot costs 1 foo and 12 baz.")
     9 (best-geodes (second (first test-geodes)) 24)
     12 (best-geodes (second (second test-geodes)) 24)
-    33 (solve-1 "resources/2022/day19.test.txt")
-    ))
+    33 (solve-1 "resources/2022/day19.test.txt")))
