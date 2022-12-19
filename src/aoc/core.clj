@@ -23,7 +23,8 @@
     [aoc-2022.day15]
     [aoc-2022.day16]
     [aoc-2022.day17]
-    [aoc-2022.day18])
+    [aoc-2022.day18]
+    [aoc-2022.day19])
   (:gen-class))
 
 (defn solve
@@ -34,7 +35,7 @@
         solve-2 (fns 'solve-2)]
 
     (when solve-1
-      (printf "%d/%d part 1 = %s" year day (with-out-str (pprint/pprint (solve-1))))
+      (printf "%d/%d part 1 = %s" year day (identity (pprint/pprint (solve-1))))
       (flush))
     (when solve-2
       (printf "%d/%d part 2 = %s" year day (with-out-str (pprint/pprint (solve-2)))))))
