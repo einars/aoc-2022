@@ -14,6 +14,8 @@
                           (* n (ore-cost (blueprints what) blueprints))))
       xs)))
 
+(def ^:dynamic *poolsize* 3000)
+
 (defn calc-ore-costs [blueprints]
   (assoc blueprints :cost 
     {:geode (ore-cost (blueprints :geode []) blueprints)
@@ -79,12 +81,12 @@
   (:clay robots 0))
 
 (defn compact-pool-2 [pool]
-  (take 3000 (reverse (sort-by (fn [e]
-                                 [(:geode (:resources e))
-                                  (:geode (:robots e))
-                                  (:obsidian (:robots e)) 
-                                  (:clay (:robots e)) 
-                                  (:ore (:robots e))]) (set pool)))))
+  (take *poolsize* (reverse (sort-by (fn [e]
+                                       [(:geode (:resources e))
+                                        (:geode (:robots e))
+                                        (:obsidian (:robots e)) 
+                                        (:clay (:robots e)) 
+                                        (:ore (:robots e))]) (set pool)))))
 
 (defn full-search
   [blueprints day pool]
@@ -116,7 +118,8 @@
   (* bp-id (best-geodes-f blueprints 24)))
 
 (defn get-best-pt2 [[bp-id blueprints]]
-  (prn bp-id)
+  (printf "%d..." bp-id)
+  (flush)
   (best-geodes-f blueprints 32))
 
 (defn solve-1
@@ -137,6 +140,12 @@
      (map parse-blueprint)
      (map get-best-pt2)
      (reduce *))))
+
+; (binding [*poolsize* 100]
+;   (best-geodes-f (second (parse-blueprint 
+;     "Blueprint 9: Each ore robot costs 3 ore. Each clay robot costs 4 ore. Each obsidian robot costs 3 ore and 12 clay. Each geode robot costs 3 ore and 17 obsidian."
+;     )) 24))
+
 
 (def test-geodes (map parse-blueprint (h/slurp-strings "resources/2022/day19.test.txt")))
 (def prod-geodes (map parse-blueprint (h/slurp-strings "resources/2022/day19.txt")))
