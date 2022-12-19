@@ -79,18 +79,15 @@
   (:clay robots 0))
 
 (defn compact-pool-2 [pool]
-  (take 10000 (reverse (sort-by (fn [e]
-                                  [(:geode (:resources e))
-                                   (:geode (:robots e))
-                                   (:obsidian (:robots e)) 
-                                   (:clay (:robots e)) 
-                                   (:ore (:robots e))]) (set pool)))))
+  (take 3000 (reverse (sort-by (fn [e]
+                                 [(:geode (:resources e))
+                                  (:geode (:robots e))
+                                  (:obsidian (:robots e)) 
+                                  (:clay (:robots e)) 
+                                  (:ore (:robots e))]) (set pool)))))
 
 (defn full-search
   [blueprints day pool]
-
-  (printf "%d. %d\n" day (count pool))
-  (flush)
 
   (if (= day 0)
     (do
@@ -114,7 +111,8 @@
 
 
 (defn get-quality-level [[bp-id blueprints]]
-  (prn bp-id)
+  (printf "%d..." bp-id)
+  (flush)
   (* bp-id (best-geodes-f blueprints 24)))
 
 (defn get-best-pt2 [[bp-id blueprints]]
