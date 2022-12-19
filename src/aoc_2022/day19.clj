@@ -19,9 +19,7 @@
     {:geode (ore-cost (blueprints :geode []) blueprints)
      :clay (ore-cost (blueprints :clay []) blueprints)
      :obsidian (ore-cost (blueprints :obsidian []) blueprints)
-     :ore (ore-cost (blueprints :ore []) blueprints)
-     }))
-
+     :ore (ore-cost (blueprints :ore []) blueprints)}))
 
 (defn parse-robot-costs
   [s]
@@ -39,8 +37,6 @@
   ;  (let [[_ bp-id costs] (re-seq #"Blueprint (\d+): (Each ([a-z]+) robot costs ((\d+) ([a-z]+)( and )?)\.+)" s)]
   (let [[_ bp-id robot-defs] (first (re-seq #"^Blueprint (\d+): (.*)" s))] 
     [(Integer/parseInt bp-id) (calc-ore-costs (into {} (parse-robot-defs robot-defs)))]))
-
-(defn best-geode [many-resources] (apply max many-resources))
 
 (defn gather-resources
   [{:keys [robots resources]}]
@@ -82,28 +78,6 @@
   (:obsidian robots 0)
   (:clay robots 0))
 
-(defn compact-pool [pool]
-  (printf "comp %d\n" (count pool))
-  (flush)
-  (let [new-pool (set (filter
-                        (fn [{:keys [resources robots] :as me}]
-                          (not (some 
-                                 ; find somebody who has more of my resources?
-                                 (fn [other]
-                                   (and
-                                     (>= (:clay (:resources other) 0) (:clay resources 0))
-                                     (>= (:ore (:resources other) 0) (:ore resources 0))
-                                     (>= (:obsidian (:resources other) 0) (:obsidian resources 0))
-                                     (>= (:clay (:robots other) 0) (:clay robots 0))
-                                     (>= (:ore (:robots other) 0) (:ore robots 0))
-                                     (>= (:obsidian (:robots other) 0) (:obsidian robots 0))
-                                     (not= me other))) pool)))
-                        pool))]
-    (printf "-> %d\n" (count new-pool))
-    new-pool
-    ))
-
-
 (defn compact-pool-2 [pool]
   (take 10000 (reverse (sort-by (fn [e]
                                   [(:geode (:resources e))
@@ -111,28 +85,6 @@
                                    (:obsidian (:robots e)) 
                                    (:clay (:robots e)) 
                                    (:ore (:robots e))]) (set pool)))))
-
-(defn find-good-geode-builds
-  [blueprints day pool n-geodes]
-
-  (printf "%d. %d, looking for g-%d\n" day (count pool) n-geodes)
-  (flush)
-
-  (if (= day 0)
-    (do
-      (printf "Best: %d\n" (:geode (:resources (first pool)) 0))
-      (:geode (:resources (first pool)) 0) )
-
-    (let [magic-pool (filter #(= n-geodes (get-in % [:robots :geode])) pool)]
-
-      (if (seq magic-pool)
-        (do
-          (printf "FOUND A GEODE ON DAY %d, %d ways, YAIIIII\n" day (count magic-pool))
-          (find-good-geode-builds blueprints day magic-pool (inc n-geodes)))
-        (let [new-pool (->> pool
-                         (mapcat #(possible-actions % blueprints))
-                         (map (fn [[act state]] (apply-action act state blueprints))))]
-          (recur blueprints (dec day) (compact-pool-2 new-pool) n-geodes))))))
 
 (defn full-search
   [blueprints day pool]
@@ -152,23 +104,13 @@
 
 
 
-(defn best-geodes ([blueprints days-left] 
-                   (find-good-geode-builds blueprints days-left [{:resources {} :robots {:ore 1}}] 1)))
-;(full-search blueprints days-left [{:resources {} :robots {:ore 1}}])))
-
 (defn best-geodes-f ([blueprints days-left] 
                      (full-search blueprints days-left [{:resources {} :robots {:ore 1}}])))
 
 (comment
-  (best-geodes (second (first test-geodes)) 24)
-  (best-geodes (second (second test-geodes)) 24)
-  (best-geodes (second (nth prod-geodes 28)) 24)
   (best-geodes-f (second (first test-geodes)) 24)
-  (best-geodes (second (second test-geodes)) 24)
   (best-geodes-f (second (nth prod-geodes 28)) 24)
-
-  (best-geodes-f (second (first test-geodes)) 32)
-  )
+  (best-geodes-f (second (first test-geodes)) 32))
 
 
 (defn get-quality-level [[bp-id blueprints]]
@@ -205,6 +147,6 @@
 
 (deftest test-stuff [] 
   (test/are [x y] (= x y)
-    9 (best-geodes (second (first test-geodes)) 24)
-    12 (best-geodes (second (second test-geodes)) 24)
+    9 (best-geodes-f (second (first test-geodes)) 24)
+    12 (best-geodes-f (second (second test-geodes)) 24)
     33 (solve-1 "resources/2022/day19.test.txt")))
