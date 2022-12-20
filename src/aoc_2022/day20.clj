@@ -36,12 +36,8 @@
         (recur ms 0 (dec n)))
 
       (let [top (dec (count ms))
-            v (:val (ms base-idx))
             cur-index (:idx (ms base-idx))
-            new-index (mod (+ cur-index (:val (ms base-idx))) top)
-            new-index (if (and (= 0 new-index) (< v 0)) top new-index) ; move over to the end
-            new-index (if (and (= top new-index) (> v 0)) 0 new-index) ; move over to the beginning
-            ]
+            new-index (mod (+ cur-index (:val (ms base-idx))) top)]
         (cond 
           (= cur-index new-index) (recur ms (inc base-idx) n)
           (> cur-index new-index) (recur (shift-back ms cur-index new-index) (inc base-idx) n)
@@ -86,5 +82,4 @@
     [1 2 3 4 0] (deindex (shift-fwd (make-indexed [0 1 2 3 4]) 0 4))
     [4 0 1 2 3] (deindex (shift-back (make-indexed [0 1 2 3 4]) 4 0))
     3 (solve-1 "resources/2022/day20.test.txt")
-    1623178306 (solve-2 "resources/2022/day20.test.txt")
-    ))
+    1623178306 (solve-2 "resources/2022/day20.test.txt")))
