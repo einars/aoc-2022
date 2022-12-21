@@ -18,6 +18,4 @@
 
 (deftest test-stuff [] 
   (test/are [x y] (= x y)
-    true false
-    ; 0 (solve-1 "resources/2022/dayN.test.txt")
-    ))
+    0 (solve-1 "resources/2022/dayN.test.txt")))
