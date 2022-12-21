@@ -18,18 +18,13 @@
   (let [[name rest] (str/split s #": ")]
     [(keyword name) (parse-math rest)] ) )
 
-(def monkey-eval)
-
-(defn monkey-eval-impl [what all]
+(defn monkey-eval [what all]
   (let [x (all what)]
-    (cond
-      (number? x) x
-      :else 
+    (if (number? x)
+      x
       (eval (list (first x)
               (monkey-eval (second x) all) 
               (monkey-eval (nth x 2) all))))))
-
-(def monkey-eval (memoize monkey-eval-impl))
 
 (defn simplify [what all]
   (let [x (all what)]
@@ -51,7 +46,9 @@
      (into {})
      (monkey-eval :root))))
 
-(defn rev-eval [expr n]
+(defn rev-eval 
+  "solve backwards `(op a b) = n` when n is known. returns :humn"
+  [expr n]
   (if (= expr :humn)
     n
     (let [[e n1 n2] expr]
