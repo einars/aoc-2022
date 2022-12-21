@@ -40,7 +40,7 @@
 (defn solve-1
   ([] (solve-1 "resources/2022/day21.txt"))
   ([file]
-   ( ->>
+   (->>
      (h/slurp-strings file)
      (map parse)
      (into {})
@@ -77,7 +77,7 @@
 (defn solve-2
   ([] (solve-2 "resources/2022/day21.txt"))
   ([file]
-   ( ->>
+   (->>
      (h/slurp-strings file)
      (map parse)
      (into {})
