@@ -12,25 +12,25 @@
            :W {:R :N, :L :S}
            :N {:R :E, :L :W}})
 
-
+(def ^:dynamic *drawing* {})
 (defn wrap-pt1
-  [drawing state]
+  [state]
   (let [x (get-in state [:at :x])
         y (get-in state [:at :y])]
     (condp = (:facing state)
-      :N (assoc-in state [:at :y] (->> (keys drawing)
+      :N (assoc-in state [:at :y] (->> (keys *drawing*)
                                     (filter #(= (:x %) x))
                                     (map :y)
                                     (apply max)))
-      :S (assoc-in state [:at :y] (->> (keys drawing)
+      :S (assoc-in state [:at :y] (->> (keys *drawing*)
                                     (filter #(= (:x %) x))
                                     (map :y)
                                     (apply min)))
-      :E (assoc-in state [:at :x] (->> (keys drawing)
+      :E (assoc-in state [:at :x] (->> (keys *drawing*)
                                     (filter #(= (:y %) y))
                                     (map :x)
                                     (apply min)))
-      :W (assoc-in state [:at :x] (->> (keys drawing)
+      :W (assoc-in state [:at :x] (->> (keys *drawing*)
                                     (filter #(= (:y %) y))
                                     (map :x)
                                     (apply max))))))
@@ -63,7 +63,7 @@
 
 (defn face-wrap
   "Manual wrapper-fn for test case"
-  [_drawing {:keys [csize] :as state}]
+  [{:keys [csize] :as state}]
   (let [[face rx ry invx invy] (current-face state)]
     (condp = [face (:facing state)]
       [2 :N] (-> state
@@ -111,7 +111,7 @@
 
 (defn pube-wrap
   "Manual wrapper-fn for my input. No, I don't want to make a generic cube layouter."
-  [_drawing {:keys [csize] :as state}]
+  [{:keys [csize] :as state}]
   (let [[face rx ry invx invy] (current-face state)
         bottom (dec csize)
         right (dec csize)]
@@ -163,34 +163,34 @@
 
 (def ^:dynamic *wrapper* wrap-pt1)
 
-(defn tile-facing [drawing state test-at]
-  (if-let [tile (drawing test-at)]
+(defn tile-facing [state test-at]
+  (if-let [tile (*drawing* test-at)]
     [tile (assoc state :at test-at)]
-    (let [new-state (*wrapper* drawing state)]
-      [(drawing (:at new-state)) new-state])))
+    (let [new-state (*wrapper* state)]
+      [(*drawing* (:at new-state)) new-state])))
 
 
 
-(defn take-step [drawing {:keys [facing at] :as state}]
+(defn take-step [{:keys [facing at] :as state}]
   ;(trace [:step state])
   (let [{:keys [x y]} at
         [tile new-state] (condp = facing
-                           :N (tile-facing drawing state {:x x :y (dec y)})
-                           :S (tile-facing drawing state {:x x :y (inc y)})
-                           :W (tile-facing drawing state {:x (dec x) :y y})
-                           :E (tile-facing drawing state {:x (inc x) :y y}))]
+                           :N (tile-facing state {:x x :y (dec y)})
+                           :S (tile-facing state {:x x :y (inc y)})
+                           :W (tile-facing state {:x (dec x) :y y})
+                           :E (tile-facing state {:x (inc x) :y y}))]
     ;(trace [facing at new-state])
     (when (= tile \.) new-state)))
 
-(defn exec [[drawing state] command]
+(defn exec [state command]
   ;(trace "exec" [state command])
   (condp = command
-    :L [drawing (update state :facing #((turn %) :L))]
-    :R [drawing (update state :facing #((turn %) :R))]
-    0 [drawing state]
-    (if-let [new-state (take-step drawing state)]
-      (recur [drawing new-state] (dec command))
-      [drawing state])))
+    :L (update state :facing #((turn %) :L))
+    :R (update state :facing #((turn %) :R))
+    0 state
+    (if-let [new-state (take-step state)]
+      (recur new-state (dec command))
+      state)))
 
 (defn parse-path
   [s]
@@ -200,14 +200,15 @@
                  (Integer/parseInt c)
                  )) (re-seq #"[\d]+|L|R" s)))
 
-(defn initial-state [drawing max-x]
-  {:facing :E
-   :csize (if (< max-x 20) 4 50)
-   :at {:x (->> drawing
-             (keys)
-             (filter #(zero? (:y %)))
-             (map :x)
-             (apply min)), :y 0}})
+(defn initial-state []
+  (let [max-x (first (sort > (map :x (keys *drawing*))))]
+    {:facing :E
+     :csize (if (< max-x 20) 4 50)
+     :at {:x (->> *drawing*
+               (keys)
+               (filter #(zero? (:y %)))
+               (map :x)
+               (apply min)), :y 0}}))
 
 (defn make-score [state]
   (let [row (inc (get-in state [:at :y]))
@@ -222,10 +223,9 @@
   ([file]
    (let [[drawing path] (str/split (slurp file) #"\n\n")
          [drawing _] (binding [h/*map-ignore* #{\space}] (h/make-xy-map (str/split drawing #"\n")))
-         max-x (first (sort > (map :x (keys drawing))))
-         path (parse-path path)
-         state (initial-state drawing max-x)]
-     (make-score (second (reduce exec [drawing state] path))))))
+         path (parse-path path)]
+     (binding [*drawing* drawing]
+       (make-score (reduce exec (initial-state) path))))))
 
 (defn solve-2
   [& param]
