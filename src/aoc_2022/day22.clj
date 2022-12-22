@@ -44,24 +44,16 @@
    (- csize 1 (mod (at :y) csize))])
 
 (defn at-face 
+  "move x, y (0..49) to the specified region n
+   0  [1] [2]  3 
+   4  [5]  6   7
+  [8] [9] 10  11
+ [12] 13  14  15"
   [csize n {:keys [x y]}]
-  (condp = n
-    ; yes, yes, I know
-    0 {:x (+ x) :y (+ y)}
-    1 {:x (+ csize x) :y (+ y)}
-    2 {:x (+ csize csize x) :y (+ y)}
-    3 {:x (+ csize csize csize x) :y (+ y)}
-    4 {:x (+ x) :y (+ csize y)}
-    5 {:x (+ csize x) :y (+ csize y)}
-    6 {:x (+ csize csize x) :y (+ csize y)}
-    7 {:x (+ csize csize csize x) :y (+ csize y)}
-    8 {:x (+ x) :y (+ csize csize y)}
-    9 {:x (+ csize x) :y (+ csize csize y)}
-    10 {:x (+ csize csize x) :y (+ csize csize y)}
-    11 {:x (+ csize csize csize x) :y (+ csize csize y)}
-    12 {:x (+ x) :y (+ csize csize csize y)}))
+  {:x (+ x (* csize (mod n 4)))
+   :y (+ y (* csize (quot n 4)))})
 
-(defn face-wrap
+(defn wrap-pt2-test
   "Manual wrapper-fn for test case"
   [{:keys [csize] :as state}]
   (let [[face rx ry invx invy] (current-face state)]
@@ -109,13 +101,12 @@
                 (assoc :facing :W)
                 (assoc :at (at-face csize 2 {:x invx :y ry}))))))
 
-(defn pube-wrap
+(defn wrap-pt2-input
   "Manual wrapper-fn for my input. No, I don't want to make a generic cube layouter."
   [{:keys [csize] :as state}]
-  (let [[face rx ry invx invy] (current-face state)
+  (let [[face rx ry _invx invy] (current-face state)
         bottom (dec csize)
         right (dec csize)]
-    ;(trace [state face rx ry])
     (condp = [face (:facing state)]
       [1 :N] (-> state
                (assoc :facing :E)
@@ -163,27 +154,28 @@
 
 (def ^:dynamic *wrapper* wrap-pt1)
 
-(defn tile-facing [state test-at]
+(defn tile-facing
+  "Step into :facing direction, wrapping regions as necessary. 
+  Returns tile at new pos (possibly wall) and updated state."
+  [state test-at]
   (if-let [tile (*drawing* test-at)]
     [tile (assoc state :at test-at)]
     (let [new-state (*wrapper* state)]
       [(*drawing* (:at new-state)) new-state])))
 
-
-
-(defn take-step [{:keys [facing at] :as state}]
-  ;(trace [:step state])
-  (let [{:keys [x y]} at
-        [tile new-state] (condp = facing
-                           :N (tile-facing state {:x x :y (dec y)})
-                           :S (tile-facing state {:x x :y (inc y)})
-                           :W (tile-facing state {:x (dec x) :y y})
-                           :E (tile-facing state {:x (inc x) :y y}))]
-    ;(trace [facing at new-state])
+(defn take-step 
+  "Step into :facing direction, wrapping regions as necessary. nil if unable to proceed."
+  [{:keys [facing at] :as state}]
+  (let [[tile new-state] (condp = facing
+                           :N (tile-facing state (update at :y dec))
+                           :S (tile-facing state (update at :y inc))
+                           :W (tile-facing state (update at :x dec))
+                           :E (tile-facing state (update at :x inc)))]
     (when (= tile \.) new-state)))
 
-(defn exec [state command]
-  ;(trace "exec" [state command])
+(defn exec
+  "apply `command` to state, return new state"
+  [state command]
   (condp = command
     :L (update state :facing #((turn %) :L))
     :R (update state :facing #((turn %) :R))
@@ -192,47 +184,48 @@
       (recur new-state (dec command))
       state)))
 
-(defn parse-path
-  [s]
+(defn parse-path [s]
   (map (fn [c] (condp = c
                  "R" :R
                  "L" :L
-                 (Integer/parseInt c)
-                 )) (re-seq #"[\d]+|L|R" s)))
+                 (Integer/parseInt c)))
+    (re-seq #"[\d]+|L|R" s)))
 
 (defn initial-state []
-  (let [max-x (first (sort > (map :x (keys *drawing*))))]
+  (let [max-x (apply max (map :x (keys *drawing*)))]
     {:facing :E
      :csize (if (< max-x 20) 4 50)
      :at {:x (->> *drawing*
                (keys)
                (filter #(zero? (:y %)))
                (map :x)
-               (apply min)), :y 0}}))
+               (apply min))
+          :y 0}}))
 
 (defn make-score [state]
   (let [row (inc (get-in state [:at :y]))
         col (inc (get-in state [:at :x]))
         facing ({:E 0, :S 1, :W 2, :N 3} (state :facing))]
-
     (+ (* row 1000) (* 4 col) facing)))
 
+(defn solve
+  "Solve the given file using *wrapper* to navigate the map."
+  [file]
+  (let [[drawing path] (str/split (slurp file) #"\n\n")
+        [drawing _] (binding [h/*map-ignore* #{\space}] (h/make-xy-map (str/split drawing #"\n")))
+        path (parse-path path)]
+    (binding [*drawing* drawing] (make-score (reduce exec (initial-state) path)))))
 
 (defn solve-1
   ([] (solve-1 "resources/2022/day22.txt"))
-  ([file]
-   (let [[drawing path] (str/split (slurp file) #"\n\n")
-         [drawing _] (binding [h/*map-ignore* #{\space}] (h/make-xy-map (str/split drawing #"\n")))
-         path (parse-path path)]
-     (binding [*drawing* drawing]
-       (make-score (reduce exec (initial-state) path))))))
+  ([f] (binding [*wrapper* wrap-pt1] (solve f))))
 
 (defn solve-2
-  [& param]
-  (binding [*wrapper* pube-wrap] (apply solve-1 param)))
+  ([] (solve-2 "resources/2022/day22.txt"))
+  ([f] (binding [*wrapper* wrap-pt2-input] (solve f))))
 
 (deftest test-stuff [] 
   (test/are [x y] (= x y)
     [10 :R 5 :L 5 :R 10 :L 4 :R 5 :L 5] (parse-path "10R5L5R10L4R5L5")
     6032 (solve-1 "resources/2022/day22.test.txt")
-    5031 (binding [*wrapper* face-wrap] (solve-1 "resources/2022/day22.test.txt"))))
+    5031 (binding [*wrapper* wrap-pt2-test] (solve "resources/2022/day22.test.txt"))))
