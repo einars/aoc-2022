@@ -11,21 +11,27 @@
   (mapv #(str/split % #"\n")
     (str/split (slurp file) #"\n\n")))
 
+(def ^:dynamic *map-ignore* #{\. \space})
+
 (defn- index-line 
   "returns list of [coordinate character]"
   [[line y]]
-  (for [[elt x] (map vector line (range)) :when (and (not= elt \.) (not= elt \space))]
+  (for [[elt x] (map vector line (range)) :when (not (*map-ignore* elt))]
     [{:x x :y y} elt]))
 
-(defn slurp-xy-map
-  "read the file as a 2d visual map and return a hashmap of coordinate -> character and its dimensions"
-  [file]
-  (let [indexed-lines (map vector (slurp-strings file) (range))
+(defn make-xy-map
+  [lines]
+  (let [indexed-lines (map vector lines (range))
         xy-maps (map index-line indexed-lines)
         xy-map(reduce (fn [xy elt] (into xy elt)) {} xy-maps)
         size-x (count indexed-lines)
         size-y (count (first (first indexed-lines)))]
     [xy-map {:x size-x :y size-y}]))
+
+(defn slurp-xy-map
+  "read the file as a 2d visual map and return a hashmap of coordinate -> character and its dimensions"
+  [file]
+  (make-xy-map (slurp-strings file)))
 
 (defn zip [& xs] (apply map vector xs))
 
