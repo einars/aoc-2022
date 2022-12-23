@@ -79,30 +79,15 @@
 
 (defn step
   [{:keys [board n]}]
-  (let [planned-moves (reduce (fn [plan elf]
-                                (update plan (planned-move elf board n) #(inc (or % 0))))
+  (let [planned-moves (reduce (fn [plan elf] (update plan (planned-move elf board n) #(if % (conj % elf) [elf])))
                         {} board)]
-    {:board (set (map #(if (= 1 (planned-moves (planned-move % board n))) (planned-move % board n) %) board))
-     :n (inc n) }))
+    {:board (set (mapcat (fn [[pos elves]] (if (> (count elves) 1) elves [pos])) planned-moves))
+     :n (inc n)}))
     
 
-(defn print-board [{:keys [board n] :as state}]
-  (printf "Iteration %d\n" n)
-  (let [x-min (apply min (map :x board))
-        x-max (apply max (map :x board))
-        y-min (apply min (map :y board))
-        y-max (apply max (map :y board))]
-    ;(printf "%d..%d, %d..%d\n" x-min x-max y-min y-max)
-    (doseq [y (range y-min (inc y-max))
-            x (range x-min (inc x-max))]
-      (printf (if (board {:x x :y y}) "#" "."))
-      (when (= x x-max) (printf "\n"))
-      ))
-  (printf "\n")
-  state)
-
 (defn make-board [elves] 
-  {:board (set elves), :n 0})
+  {:board (set elves)
+   :n 0})
 
 (defn solve-1
   ([] (solve-1 "resources/2022/day23.txt"))
@@ -115,7 +100,6 @@
      (iterate step)
      (drop 10)
      (first)
-     ;(print-board)
      (score))))
 
 (defn solve-2
@@ -132,10 +116,10 @@
                (if (= (:board prev) (:board cur)) 
                  (reduced (:n cur)) 
                  cur)) 
-     {} board-seq))))
+       {} board-seq))))
 
 ;(solve-1 "resources/2022/day23.test.txt")
-;(solve-2 "resources/2022/day23.test.txt")
+;(solve-2 "resources/2022/day23.txt")
 (deftest test-stuff [] 
   (test/are [x y] (= x y)
     110 (solve-1 "resources/2022/day23.test.txt")
