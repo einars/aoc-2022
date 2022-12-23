@@ -128,11 +128,15 @@
                      (make-board)
                      (iterate step))
          ]
-     (reduce (fn [prev cur] (if (= (:board prev) (:board cur)) (reduced (:n cur)) cur)) {} board-seq ) )))
+     (reduce (fn [prev cur] 
+               (if (= (:board prev) (:board cur)) 
+                 (reduced (:n cur)) 
+                 cur)) 
+     {} board-seq))))
 
 ;(solve-1 "resources/2022/day23.test.txt")
 ;(solve-2 "resources/2022/day23.test.txt")
 (deftest test-stuff [] 
   (test/are [x y] (= x y)
-    110 (solve-1 "resources/2022/day23.test.txt")))
-20 (solve-2 "resources/2022/day23.test.txt")
+    110 (solve-1 "resources/2022/day23.test.txt")
+    20 (solve-2 "resources/2022/day23.test.txt")))
