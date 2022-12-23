@@ -12,7 +12,6 @@
         x-max (apply max (map :x board))
         y-min (apply min (map :y board))
         y-max (apply max (map :y board))]
-
     (- (* (inc (- y-max y-min)) (inc (- x-max x-min)))
       (count board))))
 
@@ -21,10 +20,10 @@
 (defn get-w [elf] (update elf :x dec))
 (defn get-e [elf] (update elf :x inc))
 
-(defn get-ne [elf] (-> elf get-n get-e))
-(defn get-nw [elf] (-> elf get-n get-w))
-(defn get-se [elf] (-> elf get-s get-e))
-(defn get-sw [elf] (-> elf get-s get-w))
+(defn get-ne [{:keys [x y]}] {:x (inc x) :y (dec y)})
+(defn get-nw [{:keys [x y]}] {:x (dec x) :y (dec y)})
+(defn get-se [{:keys [x y]}] {:x (inc x) :y (inc y)})
+(defn get-sw [{:keys [x y]}] {:x (dec x) :y (inc y)})
 
 (defn test-0 [elf board]
   (cond
