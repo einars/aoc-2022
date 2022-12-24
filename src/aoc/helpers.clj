@@ -24,8 +24,8 @@
   (let [indexed-lines (map vector lines (range))
         xy-maps (map index-line indexed-lines)
         xy-map(reduce (fn [xy elt] (into xy elt)) {} xy-maps)
-        size-x (count indexed-lines)
-        size-y (count (first (first indexed-lines)))]
+        size-y (count indexed-lines)
+        size-x (count (first (first indexed-lines)))]
     [xy-map {:x size-x :y size-y}]))
 
 (defn slurp-xy-map
