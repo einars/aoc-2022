@@ -20,6 +20,7 @@
     (->
       (reduce into {} pairs)
       (assoc {:x (- size-x 2) :y size-y} :prevent-walking-out )
+      (assoc {:x 1 :y -1} :prevent-walking-out )
       (dissoc {:x (- size-x 2) :y (dec size-y)})
       (dissoc {:x 1 :y 0}))))
 
@@ -50,11 +51,11 @@
         me-e (update me :x inc)]
 
     (filter identity
-      [(and (nil? (winds-n me)) (nil? (winds-w me)) (nil? (winds-s me)) (nil? (winds-e me)) (nil? (wraps me)) me) ; wait
-       (when (> (me :y) 0) (and (nil? (winds-n me-n)) (nil? (winds-w me-n)) (nil? (winds-s me-n)) (nil? (winds-e me-n)) (nil? (wraps me-n)) me-n))
-       (and (nil? (winds-n me-w)) (nil? (winds-w me-w)) (nil? (winds-s me-w)) (nil? (winds-e me-w)) (nil? (wraps me-w)) me-w)
-       (and (nil? (winds-n me-s)) (nil? (winds-w me-s)) (nil? (winds-s me-s)) (nil? (winds-e me-s)) (nil? (wraps me-s)) me-s)
-       (and (nil? (winds-n me-e)) (nil? (winds-w me-e)) (nil? (winds-s me-e)) (nil? (winds-e me-e)) (nil? (wraps me-e)) me-e)])))
+      [(when-not (or (wraps me) (winds-n me) (winds-w me) (winds-s me) (winds-e me)) me) ; wait
+       (when-not (or (wraps me-n) (winds-n me-n) (winds-w me-n) (winds-s me-n) (winds-e me-n)) me-n)
+       (when-not (or (wraps me-w) (winds-n me-w) (winds-w me-w) (winds-s me-w) (winds-e me-w)) me-w)
+       (when-not (or (wraps me-s) (winds-n me-s) (winds-w me-s) (winds-s me-s) (winds-e me-s)) me-s)
+       (when-not (or (wraps me-e) (winds-n me-e) (winds-w me-e) (winds-s me-e) (winds-e me-e)) me-e)])))
 
 (defn solve 
   ([board start goal] (solve board [start] goal 0))
@@ -90,8 +91,8 @@
 
 ;(solve-1 "resources/2022/day24.test.txt")
 ;(solve-2 "resources/2022/day24.test.txt")
-;(solve-2 "resources/2022/day24.txt")
 ;(solve-1 "resources/2022/day24.txt")
+;(solve-2 "resources/2022/day24.txt")
 ;(solve-1 "resources/2022/day24.minitest.txt")
 
 (deftest test-stuff [] 
