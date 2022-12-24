@@ -36,6 +36,7 @@
      :winds-w (set (h/find-keys #(= \< %) board))
      :winds-e (set (h/find-keys #(= \> %) board))
      :winds-s (set (h/find-keys #(= \v %) board))
+     :start {:x 1, :y 0}
      :target {:x (- (dimensions :x) 2), :y (dec (dimensions :y))}
      :wraps wraps}))
 
@@ -54,33 +55,44 @@
        (and (nil? (winds-n me-e)) (nil? (winds-w me-e)) (nil? (winds-s me-e)) (nil? (winds-e me-e)) (nil? (wraps me-e)) me-e)])))
 
 (defn solve 
-  ([board] (solve board [{:x 1, :y 0}] 0))
-  ([board pool it]
-   ;(prn it :pool pool)
-   ;(flush)
+  ([board start goal] (solve board [start] goal 0))
+  ([board pool goal it]
+
+   (prn :it it) 
+   (flush)
 
    (when (seq pool)
      (let [new-board (next-state board)
            new-pool (reduce (fn [new-pool loc] (reduce conj new-pool (poss-actions loc new-board)) )
                       #{} pool) ]
 
-       (if (new-pool (:target board))
-         (inc it)
-         (recur new-board new-pool (inc it)))))))
+       (if (new-pool goal)
+         [new-board (inc it)]
+         (recur new-board new-pool goal (inc it)))))))
 
 (defn solve-1
   ([] (solve-1 "resources/2022/day24.txt"))
   ([file]
-   (->>
-     (h/slurp-xy-map file)
-     make-map
-     solve
-     )))
+   (let [b (make-map (h/slurp-xy-map file))]
+     (second (solve b (:start b) (:target b))))))
+
+(defn solve-2
+  ([] (solve-2 "resources/2022/day24.txt"))
+  ([file]
+   (let [b0 (make-map (h/slurp-xy-map file))
+         [b1 c1] (solve b0 (:start b0) (:target b0))
+         [b2 c2] (solve b1 (:target b0) (:start b0))
+         [_b3 c3] (solve b2 (:start b0) (:target b0))]
+     (+ c1 c2 c3))))
+
 
 ;(solve-1 "resources/2022/day24.test.txt")
+;(solve-2 "resources/2022/day24.test.txt")
+;(solve-2 "resources/2022/day24.txt")
 ;(solve-1 "resources/2022/day24.txt")
 ;(solve-1 "resources/2022/day24.minitest.txt")
 
 (deftest test-stuff [] 
   (test/are [x y] (= x y)
-    18 (solve-1 "resources/2022/day24.test.txt")))
+    18 (solve-1 "resources/2022/day24.test.txt")
+    54 (solve-2 "resources/2022/day24.test.txt")))
