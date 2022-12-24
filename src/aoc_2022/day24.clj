@@ -5,6 +5,7 @@
     [clojure.string :as str]
     [clojure.tools.trace :refer [trace deftrace]]
     [clojure.pprint :as pp]
+    ;[flames.core :as flames]
     [aoc.helpers :as h]))
 
 (defn make-wraps [dimensions]
@@ -18,15 +19,16 @@
                  [{:x x, :y (dec size-y)} {:x x :y 1}]])]
     (->
       (reduce into {} pairs)
+      (assoc {:x (- size-x 2) :y size-y} :prevent-walking-out )
       (dissoc {:x (- size-x 2) :y (dec size-y)})
       (dissoc {:x 1 :y 0}))))
 
 (defn next-state [{:keys [wraps winds-n winds-w winds-e winds-s] :as board}]
   (-> board
-    (assoc :winds-n (set (map #(or (wraps %) %) (map #(update % :y dec) winds-n))))
-    (assoc :winds-s (set (map #(or (wraps %) %) (map #(update % :y inc) winds-s))))
-    (assoc :winds-w (set (map #(or (wraps %) %) (map #(update % :x dec) winds-w))))
-    (assoc :winds-e (set (map #(or (wraps %) %) (map #(update % :x inc) winds-e))))))
+    (assoc :winds-n (set (map #(wraps % %) (map #(update % :y dec) winds-n))))
+    (assoc :winds-s (set (map #(wraps % %) (map #(update % :y inc) winds-s))))
+    (assoc :winds-w (set (map #(wraps % %) (map #(update % :x dec) winds-w))))
+    (assoc :winds-e (set (map #(wraps % %) (map #(update % :x inc) winds-e))))))
 
 (defn make-map 
   [[board dimensions]]
@@ -58,13 +60,13 @@
   ([board start goal] (solve board [start] goal 0))
   ([board pool goal it]
 
-   (prn :it it) 
+   (prn :it it :n (count pool)) 
    (flush)
 
    (when (seq pool)
      (let [new-board (next-state board)
            new-pool (reduce (fn [new-pool loc] (reduce conj new-pool (poss-actions loc new-board)) )
-                      #{} pool) ]
+                      #{} pool)]
 
        (if (new-pool goal)
          [new-board (inc it)]
@@ -96,3 +98,4 @@
   (test/are [x y] (= x y)
     18 (solve-1 "resources/2022/day24.test.txt")
     54 (solve-2 "resources/2022/day24.test.txt")))
+
