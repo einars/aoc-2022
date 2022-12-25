@@ -7,8 +7,6 @@
     [clojure.pprint :as pp]
     [aoc.helpers :as h]))
 
-;(defn int->snafu [n] nil)
-
 (def defu-chars {\= -2, \- -1, \0 0, \1 1, \2 2})
 (def snafu-chars {0 \=, 1 \-, 2 \0, 3 \1, 4 \2})
 
@@ -18,7 +16,6 @@
    (if (seq rs)
      (recur (rest rs) (* n 5) (+ accu (* n (defu-chars (first rs)))))
      accu )))
-
 
 (defn int->snafu 
   ([n] (int->snafu n 0 []))
@@ -44,6 +41,5 @@
   (test/are [x y] (= x y)
     "2=-1=0" (solve-1 "resources/2022/day25.test.txt")
     1747 (snafu->int "1=-0-2")
-    "1121-1110-1=0" (int->snafu 314159265)
-    ))
+    "1121-1110-1=0" (int->snafu 314159265)))
 
