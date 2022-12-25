@@ -10,7 +10,7 @@
 ;(defn int->snafu [n] nil)
 
 (def defu-chars {\= -2, \- -1, \0 0, \1 1, \2 2})
-(def snafu-chars {0 \=, 1 \- 2, \0 3, \1 4, \2})
+(def snafu-chars {0 \=, 1 \-, 2 \0, 3 \1, 4 \2})
 
 (defn snafu->int 
   ([s] (snafu->int (reverse s) 1 0))
