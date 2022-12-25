@@ -8,21 +8,26 @@
     ;[flames.core :as flames]
     [aoc.helpers :as h]))
 
+(defrecord Coord [x y]
+  Object
+  (toString [_]
+    (format "C[%d %d]" x y)))
+
 (defn make-wraps [dimensions]
   (let [size-x (:x dimensions)
         size-y (:y dimensions)
         pairs (for [x (range 0 size-x)
                     y (range 0 size-y)]
-                [[{:x 0, :y y} {:x (- size-x 2) :y y}]
-                 [{:x (dec size-x), :y y} {:x 1 :y y}]
-                 [{:x x, :y 0} {:x x :y (- size-y 2)}]
-                 [{:x x, :y (dec size-y)} {:x x :y 1}]])]
+                [[(Coord. 0 y) (Coord. (- size-x 2) y)]
+                 [(Coord. (dec size-x) y) (Coord. 1 y)]
+                 [(Coord. x 0) (Coord. x (- size-y 2))]
+                 [(Coord. x (dec size-y)) (Coord. x 1)]])]
     (->
       (reduce into {} pairs)
-      (assoc {:x (- size-x 2) :y size-y} :prevent-walking-out )
-      (assoc {:x 1 :y -1} :prevent-walking-out )
-      (dissoc {:x (- size-x 2) :y (dec size-y)})
-      (dissoc {:x 1 :y 0}))))
+      (assoc (Coord. (- size-x 2) size-y) :prevent-walking-out )
+      (assoc (Coord. 1 -1) :prevent-walking-out )
+      (dissoc (Coord. (- size-x 2) (dec size-y)))
+      (dissoc (Coord. 1 0)))))
 
 (defn next-state [{:keys [wraps winds-n winds-w winds-e winds-s] :as board}]
   (-> board
@@ -33,14 +38,13 @@
 
 (defn make-map 
   [[board dimensions]]
-  (prn dimensions)
   (let [wraps (make-wraps dimensions)]
-    {:winds-n (set (h/find-keys #(= \^ %) board))
-     :winds-w (set (h/find-keys #(= \< %) board))
-     :winds-e (set (h/find-keys #(= \> %) board))
-     :winds-s (set (h/find-keys #(= \v %) board))
-     :start {:x 1, :y 0}
-     :target {:x (- (dimensions :x) 2), :y (dec (dimensions :y))}
+    {:winds-n (set (map #(Coord. (:x %) (:y %)) (h/find-keys #(= \^ %) board)))
+     :winds-w (set (map #(Coord. (:x %) (:y %)) (h/find-keys #(= \< %) board)))
+     :winds-e (set (map #(Coord. (:x %) (:y %)) (h/find-keys #(= \> %) board)))
+     :winds-s (set (map #(Coord. (:x %) (:y %)) (h/find-keys #(= \v %) board)))
+     :start (Coord. 1 0)
+     :target (Coord. (- (:x dimensions) 2) (dec (:y dimensions)))
      :wraps wraps}))
 
 
