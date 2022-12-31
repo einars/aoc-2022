@@ -22,12 +22,14 @@
 (defn get-height [walls]
   (first (sort > (map second walls))))
 
-(def paints 
-  {:bg (paint/fill 0x40e9b96e)
-   :wall (paint/fill 0xff888a85)
-   :sand (paint/fill 0xff8f5902)
-   :grain (paint/fill 0xfff57900)
 
+
+
+(def paints 
+  {:bg (paint/fill 0x2009b96e)
+   :wall (paint/fill 0xff088a85)
+   :sand (paint/fill 0xff8f0902)
+   :grain (paint/fill 0xfff57900)
    })
 
 (def step-1 (partial iterate tower/iterate-1))
@@ -35,12 +37,12 @@
   (let [next-t (tower/iterate-until-settled-1 t)
         new-sand (set/difference (:sand next-t) (:sand t))
         ]
-        (if-let [[sx sy] (first new-sand)]
-          (if (and (= 1 (count new-sand)) (or ((:sand t) [(dec sx) (inc sy)])
-            ((:sand t) [(inc sx) (inc sy)])))
-            (recur next-t)
-            next-t)
-          next-t)))
+    (if-let [[sx sy] (first new-sand)]
+      (if (and (= 1 (count new-sand)) (or ((:sand t) [(dec sx) (inc sy)])
+                                        ((:sand t) [(inc sx) (inc sy)])))
+        (recur next-t)
+        next-t)
+      next-t)))
 
 
 (defn paint-canvas [ctx canvas size]
@@ -60,7 +62,7 @@
 
     (canvas/translate canvas (/ (:width size) 2) 0)
 
-    (let [scale ( / (:height size) (+ 4 height))]
+    (let [scale ( / (:height size) (+ 16 height))]
       (canvas/scale canvas scale scale))
 
     (canvas/translate canvas -500 0)   ; [0 500] in the center
@@ -126,4 +128,19 @@
   (:sand @*tower)
   (-main))
 
+(swap! *tower (fn [t] (assoc t :running false)))
 
+
+
+(def a (range 500))
+
+(apply + (map inc (take 10 (range 500))))
+(->> a
+  (take 10)
+  (map inc)
+  count)
+
+
+(comp
+  (take 10)
+  (map inc))
