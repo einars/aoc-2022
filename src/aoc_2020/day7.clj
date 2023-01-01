@@ -29,11 +29,13 @@
    (reduce 
      set/union 
      (if (bags t) (conj accu t) accu)
-     (for [[bt bb] bags :when (bb t)] (count-type bt bags #{})))))
+     (for [[bag-type bagses] bags :when (bagses t)] (count-type bag-type bags #{})))))
 
 (defn count-bagrev
   [t bags]
-  (reduce + (if (bags t) 1 0) (map (fn [[bt bn]] (* bn (count-bagrev bt bags))) (bags t))))
+  (reduce + 
+    (if (bags t) 1 0)
+    (map (fn [[bag-type n-bags]] (* n-bags (count-bagrev bag-type bags))) (bags t))))
 
 
 (defn solve-1

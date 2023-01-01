@@ -7,6 +7,7 @@
     [aoc-2016.day2]
 
     [aoc-2020.day7]
+    [aoc-2020.day8]
 
     [aoc-2022.day1]
     [aoc-2022.day2]
