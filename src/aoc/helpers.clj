@@ -1,6 +1,7 @@
 (ns aoc.helpers
   (:require
     [clojure.string :as str]
+    [clojure.edn :as edn]
     [clojure.java.io :as io]))
 
 (defn slurp-strings [file]
@@ -40,7 +41,8 @@
     (map vector (range n) xs)))
 
 (defn slurp-ints [file]
-  (mapv #(Integer/parseInt %) (slurp-strings file)))
+  ; use end/read-string as a general way to avoid Integer/parseInt being unable to read bigints etc
+  (map edn/read-string (slurp-strings file)))
 
 (defn find-keys [pred m]
   (map first (filter (fn [[_k v]] (pred v)) m)))
