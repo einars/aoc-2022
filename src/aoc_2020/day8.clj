@@ -78,4 +78,4 @@
 (deftest test-stuff [] 
   (test/are [x y] (= x y)
     5 (solve-1 "resources/2020/day8.test.txt")
-    8 (solve-1 "resources/2020/day8.test.txt")))
+    8 (solve-2 "resources/2020/day8.test.txt")))
