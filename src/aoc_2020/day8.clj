@@ -27,6 +27,27 @@
                     :jmp (update new-state :pc #(+ n %)))]
     new-state))
 
+(defn terminal? [state]
+  (or
+    (>= (:pc state) (count (:code state)))
+    (get (:visited state) (:pc state))))
+
+(defn modifications-seq 
+  "Returns sequence of program code with one nop changed to jmp or jmp to nop"
+  [code]
+  (concat
+    (for [[idx [cmd n]] (h/indexed code) :when (= cmd :nop)]
+      (assoc code idx [:jmp n]))
+    (for [[idx [cmd n]] (h/indexed code) :when (= cmd :jmp)]
+      (assoc code idx [:nop n]))))
+
+(defn run-until-completion [code]
+  (->> code
+    initial-state
+    (iterate exec)
+    (drop-while (complement terminal?))
+    first))
+
 (defn solve-1
   ([] (solve-1 "resources/2020/day8.txt"))
   ([file]
@@ -35,12 +56,26 @@
      (mapv parse)
      initial-state
      (iterate exec)
-     (drop-while (fn [st] (not (get (:visited st) (:pc st)))))
+     (drop-while (complement terminal?))
      (first)
      :acc)))
 
-(solve-1 "resources/2020/day8.test.txt")
+(defn solve-2
+  ([] (solve-2 "resources/2020/day8.txt"))
+  ([file]
+   (->>
+     (h/slurp-strings file)
+     (mapv parse)
+     modifications-seq
+     (map run-until-completion)
+     (drop-while (fn [final-st] (get (:visited final-st) (:pc final-st))))
+     (first)
+     :acc)))
+
+;(solve-1 "resources/2020/day8.test.txt")
+;(solve-2 "resources/2020/day8.test.txt")
 
 (deftest test-stuff [] 
   (test/are [x y] (= x y)
-    5 (solve-1 "resources/2020/day8.test.txt")))
+    5 (solve-1 "resources/2020/day8.test.txt")
+    8 (solve-1 "resources/2020/day8.test.txt")))

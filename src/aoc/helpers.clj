@@ -35,6 +35,10 @@
 
 (defn zip [& xs] (apply map vector xs))
 
+(defn indexed [xs]
+  (let [n (count xs)]
+    (map vector (range n) xs)))
+
 (defn slurp-ints [file]
   (mapv #(Integer/parseInt %) (slurp-strings file)))
 
