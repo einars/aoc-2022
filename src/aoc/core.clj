@@ -11,6 +11,7 @@
     [aoc-2020.day9]
     [aoc-2020.day10]
     [aoc-2020.day11]
+    [aoc-2020.day12]
 
     [aoc-2022.day1]
     [aoc-2022.day2]
