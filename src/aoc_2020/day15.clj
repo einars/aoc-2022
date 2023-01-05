@@ -7,21 +7,22 @@
     [clojure.pprint :as pp]
     [aoc.helpers :as h]))
 
-(defn sub-helper [[a b]] (- b a))
-
 (defn streamline 
   ([start-stream]
    (let [state (into {} (map vector start-stream (map vector (range 1 (inc (count start-stream))))))]
-     (concat start-stream (streamline state (last start-stream) (inc (count start-stream))))))
+     (concat 
+       start-stream 
+       (streamline state (last start-stream) (inc (count start-stream))))))
   ([state last-number turn]
    (lazy-seq
-     (let [new-number 
-           (if (= 1 (count (state last-number)))
-             0
-             (sub-helper (take-last 2 (state last-number))))]
+     (let [new-number (if (= 1 (count (state last-number)))
+                        0
+                        (apply - (state last-number)))]
        (cons new-number
          (streamline 
-           (assoc state new-number (conj (get state new-number []) turn))
+           (if (contains? state new-number)
+             (assoc state new-number [turn (first (state new-number))])
+             (assoc state new-number [turn]))
            new-number
            (inc turn)))))))
 
@@ -36,8 +37,18 @@
      to-int-list
      streamline
      (drop 2019)
-     first)))
+     first
+     )))
 
+(defn solve-2
+  ([] (solve-2 "resources/2020/day15.txt"))
+  ([file]
+   (->>
+     (slurp file)
+     to-int-list
+     streamline
+     (drop 29999999)
+     first)))
 
 (deftest test-stuff [] 
   (test/are [x y] (= x y)
