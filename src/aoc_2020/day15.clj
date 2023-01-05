@@ -9,22 +9,17 @@
 
 (defn streamline 
   ([start-stream]
-   (let [state (into {} (map vector start-stream (map vector (range 1 (inc (count start-stream))))))]
+   (let [state (into {} (map vector start-stream (range 1 (inc (count start-stream)))))]
      (concat 
-       start-stream 
-       (streamline state (last start-stream) (inc (count start-stream))))))
-  ([state last-number turn]
+       start-stream
+       (streamline state 0 (inc (count start-stream))))))
+  ([state next-number turn]
    (lazy-seq
-     (let [new-number (if (= 1 (count (state last-number)))
-                        0
-                        (apply - (state last-number)))]
-       (cons new-number
-         (streamline 
-           (if (contains? state new-number)
-             (assoc state new-number [turn (first (state new-number))])
-             (assoc state new-number [turn]))
-           new-number
-           (inc turn)))))))
+     (cons next-number 
+       (streamline 
+         (assoc state next-number turn)
+         (if (contains? state next-number) (- turn (state next-number)) 0)
+         (inc turn))))))
 
 (defn to-int-list [s]
   (map #(Integer/parseInt %) (str/split (str/trim s) #",")))
@@ -37,8 +32,7 @@
      to-int-list
      streamline
      (drop 2019)
-     first
-     )))
+     first)))
 
 (defn solve-2
   ([] (solve-2 "resources/2020/day15.txt"))
