@@ -2,7 +2,7 @@
   (:require
     [clojure.test :as test :refer [deftest]]
     [clojure.set :as set]
-    [clojure.string :as str]
+    [clojure.string :as string]
     [clojure.tools.trace :refer [trace deftrace]]
     [clojure.pprint :as pp]
     [aoc.helpers :as h]))

@@ -50,3 +50,6 @@
 (defn find-vals [pred m]
   (map second (filter (fn [[_k v]] (pred v)) m)))
 
+(defn to-int-list [s]
+  (map #(Integer/parseInt %) (str/split (str/trim s) #",")))
+

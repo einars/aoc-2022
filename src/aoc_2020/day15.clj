@@ -1,48 +1,36 @@
 (ns aoc-2020.day15
   (:require
     [clojure.test :as test :refer [deftest]]
-    [clojure.set :as set]
-    [clojure.string :as str]
-    [clojure.tools.trace :refer [trace deftrace]]
-    [clojure.pprint :as pp]
-    [aoc.helpers :as h]))
+    [clojure.string :as str]))
 
 (defn streamline 
   ([start-stream]
-   (let [state (into {} (map vector start-stream (range 1 (inc (count start-stream)))))]
+   (let [state (into {} (map vector start-stream (map inc (range (count start-stream)))))]
      (concat 
        start-stream
-       (streamline state 0 (inc (count start-stream))))))
-  ([state next-number turn]
+       (streamline (transient state) 0 (inc (count start-stream))))))
+  ([state number turn]
    (lazy-seq
-     (cons next-number 
-       (streamline 
-         (assoc state next-number turn)
-         (if (contains? state next-number) (- turn (state next-number)) 0)
-         (inc turn))))))
+     (let [next-number (- turn (get state number turn))]
+       (cons number 
+         (streamline (assoc! state number turn) next-number (inc turn)))))))
 
 (defn to-int-list [s]
   (map #(Integer/parseInt %) (str/split (str/trim s) #",")))
 
 (defn solve-1
   ([] (solve-1 "resources/2020/day15.txt"))
-  ([file]
+  ([file] (solve-1 file 2020))
+  ([file n]
    (->>
      (slurp file)
      to-int-list
      streamline
-     (drop 2019)
+     (drop (dec n))
      first)))
 
 (defn solve-2
-  ([] (solve-2 "resources/2020/day15.txt"))
-  ([file]
-   (->>
-     (slurp file)
-     to-int-list
-     streamline
-     (drop 29999999)
-     first)))
+  ([] (solve-1 "resources/2020/day15.txt" 30000000)))
 
 (deftest test-stuff [] 
   (test/are [x y] (= x y)
