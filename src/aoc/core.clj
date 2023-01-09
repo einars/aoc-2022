@@ -2,53 +2,16 @@
   (:require
     [clojure.string :as str]
     [clojure.pprint :as pprint]
-
-    [aoc-2016.day1]
-    [aoc-2016.day2]
-
-    [aoc-2020.day7]
-    [aoc-2020.day8]
-    [aoc-2020.day9]
-    [aoc-2020.day10]
-    [aoc-2020.day11]
-    [aoc-2020.day12]
-    [aoc-2020.day13]
-    [aoc-2020.day14]
-    [aoc-2020.day15]
-    [aoc-2020.day16]
-    [aoc-2020.day17]
-
-    [aoc-2022.day1]
-    [aoc-2022.day2]
-    [aoc-2022.day3]
-    [aoc-2022.day4]
-    [aoc-2022.day5]
-    [aoc-2022.day6]
-    [aoc-2022.day7]
-    [aoc-2022.day8]
-    [aoc-2022.day9]
-    [aoc-2022.day10]
-    [aoc-2022.day11]
-    [aoc-2022.day12]
-    [aoc-2022.day13]
-    [aoc-2022.day14]
-    [aoc-2022.day15]
-    [aoc-2022.day16]
-    [aoc-2022.day17]
-    [aoc-2022.day18]
-    [aoc-2022.day19]
-    [aoc-2022.day20]
-    [aoc-2022.day21]
-    [aoc-2022.day22]
-    [aoc-2022.day23]
-    [aoc-2022.day24]
-    [aoc-2022.day25])
+    )
   (:gen-class))
 
 (defn solve
   [year day]
   (let [nsn (symbol (format "aoc-%d.day%d" year day))
-        fns (try (ns-publics nsn) (catch Exception _ {}))
+        fns (try 
+              (require nsn) 
+              (ns-publics nsn)
+              (catch Exception _ {}))
         solve-1 (fns 'solve-1)
         solve-2 (fns 'solve-2)]
 
