@@ -27,6 +27,6 @@
   (if (seq args)
     (apply solve (->> (str/split (first args) #"/")
                    (map #(Integer/parseInt %))))
-    (doseq [y (range 2015 2023)
-            d (range 26)]
+    (doseq [y [2023]
+            d (range 32)]
       (solve y d))))
