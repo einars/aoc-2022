@@ -1,8 +1,6 @@
 (ns aoc.core
   (:require
-    [clojure.string :as str]
-    [clojure.pprint :as pprint]
-    )
+    [clojure.string :as str])
   (:gen-class))
 
 (defn solve
@@ -11,7 +9,8 @@
         fns (try 
               (require nsn) 
               (ns-publics nsn)
-              (catch Exception _ {}))
+              (catch java.io.FileNotFoundException _ {})
+              (catch Exception e (do (prn e) {})))
         solve-1 (fns 'solve-1)
         solve-2 (fns 'solve-2)]
 
@@ -28,5 +27,5 @@
     (apply solve (->> (str/split (first args) #"/")
                    (map #(Integer/parseInt %))))
     (doseq [y [2023]
-            d (range 32)]
+            d (range 1 (inc 25))]
       (solve y d))))

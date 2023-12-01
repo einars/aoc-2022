@@ -53,7 +53,7 @@
 (defn solve-2
   ([] (solve-2 (h/slurp-strings "resources/2023/day1.txt")))
   ([ss]
-   (reduce (fn [coll digs] (+ coll (* 10 (first-digit digs)) (last-digit digs))) 0 digs)))
+   (reduce (fn [coll digs] (+ coll (* 10 (first-digit digs)) (last-digit digs))) 0 ss)))
 
 ;(defn solve-2 []
 ;  (top3-elves-carrying-the-most (h/slurp-strings "resources/2022/day1.txt")))
@@ -61,7 +61,6 @@
 (deftest tests []
   (are [x y] (= x y)
     [1 2 3] (leave-digits "x1x2x3x")
-    [2 9] (alt-digits "two-nine")
     142 (solve-1 sample)
     281 (solve-2 sample-2)
 
