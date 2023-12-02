@@ -2,7 +2,8 @@
  :deps {
         org.clojure/clojure {:mvn/version "1.11.1"}
         org.clojure/tools.trace {:mvn/version "0.7.11"}
-        org.clojure/core.match {:mvn/version "1.0.1"}}
+        org.clojure/core.match {:mvn/version "1.0.1"}
+        nrepl/nrepl {:mvn/version "1.1.0"}}
  :aliases
  {:neil {:project {:name aoc/aoc :version "0.10.6"}}
   :run {:main-opts ["-m" "aoc.core"]}
@@ -22,4 +23,3 @@
   :main-opts ["-m" "cognitect.test-runner"]
   :exec-fn cognitect.test-runner.api/test}
   }}
-
