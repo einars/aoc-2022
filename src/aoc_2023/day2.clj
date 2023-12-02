@@ -32,11 +32,11 @@
 
 
 (defn make-reveal [colors] 
-  (into {} (mapv (fn [[_ n k]] [(keyword k) (Integer/parseInt n)]) (rest colors))))
+  (into {} (mapv (fn [[_ n k]] [(keyword k) (parse-long n)]) (rest colors))))
 
 (defn parse-game [g]
   (let [[game & reveals] (game-parser g)]
-    {:game (Integer/parseInt game)
+    {:game (parse-long game)
      :reveals (mapv make-reveal reveals)}))
 
 
