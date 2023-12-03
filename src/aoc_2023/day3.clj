@@ -53,11 +53,22 @@
        (+ (toint (engine coords)) (* accu 10)))
      (when touching? accu))))
 
+(defn gear-candidates [m]
+  (->> m
+    (filterv (fn [[_coords sym]] (= sym \*)))
+    (mapv first)))
 
-(def sample-touchmap (engine->sym-pattern sample-engine))
+(defn get-gear-ratio [m number-coords gear-coords]
+  (let [touchmap (set (h/neighbors-8 gear-coords))
+        connected-numbers (->> number-coords
+                            (map #(pick-number-at % m touchmap))
+                            (filter some?))]
+    (when (= 2 (count connected-numbers))
+      (reduce * connected-numbers))))
+
 
 (defn solve-1
-  ([] (solve-1 (second (h/slurp-xy-map "resources/2023/day3.txt"))))
+  ([] (solve-1 (first (h/slurp-xy-map "resources/2023/day3.txt"))))
   ([m]
    (let [touchmap (engine->sym-pattern m)
          number-coords (number-starting-coords m)]
@@ -66,7 +77,20 @@
        (filter some?)
        (reduce +)))))
 
+(defn solve-2
+  ([] (solve-2 (first (h/slurp-xy-map "resources/2023/day3.txt"))))
+  ([m]
+   (let [gears (gear-candidates m)
+         numbermap (number-starting-coords m)
+         gears (map #(get-gear-ratio m numbermap %) gears)]
+     (reduce + (filter some? gears)))))
 
 (deftest test-stuff [] 
   (test/are [x y] (= x y)
-    4361 (solve-1 sample-engine)))
+    4361 (solve-1 sample-engine)
+    467835 (solve-2 sample-engine)
+    ))
+
+(comment
+  (solve-1)
+  )
