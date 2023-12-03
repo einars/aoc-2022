@@ -1,10 +1,6 @@
 (ns aoc-2023.day3
   (:require
     [clojure.test :as test :refer [deftest]]
-    [clojure.set :as set]
-    [clojure.string :as str]
-    [clojure.tools.trace :refer [trace deftrace]]
-    [clojure.pprint :as pp]
     [aoc.helpers :as h]))
 
 (def sample-engine 
@@ -21,7 +17,7 @@
             ".664.598.."])))
 
 
-(def digits #{\0 \1 \2 \3 \4 \5 \6 \7 \8 \9 })
+(def digits {\0 0 \1 1 \2 2 \3 3 \4 4 \5 5 \6 6 \7 7 \8 8 \9 9})
 
 (defn symbol-neighbors [[coords sym]]
   (when-not (digits sym)
@@ -36,22 +32,19 @@
                (and 
                  (digits sym) 
                  (not (digits (e (h/left-of coords)))))))
-    (mapv first) ; leave only coords
-    set))
+    (mapv first))) ; leave only coords
 
-(defn toint [c] (- (int c) 0x30))
 
-(defn pick-number-at 
-  ([coords engine touchmap] (pick-number-at coords engine touchmap false 0))
-  ([coords engine touchmap touching? accu]
-   (if (digits (engine coords))
-     (recur 
-       (h/right-of coords) 
-       engine
-       touchmap
-       (or touching? (touchmap coords))
-       (+ (toint (engine coords)) (* accu 10)))
-     (when touching? accu))))
+(defn pick-number-at [coords engine touchmap]
+  (loop [coords coords 
+         touching? false
+         accu 0]
+    (if-let [d (digits (engine coords))]
+      (recur 
+        (h/right-of coords) 
+        (or touching? (touchmap coords))
+        (+ d (* accu 10)))
+      (when touching? accu))))
 
 (defn gear-candidates [m]
   (->> m
@@ -93,4 +86,4 @@
 
 (comment
   (solve-1)
-  )
+  (solve-2))

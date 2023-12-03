@@ -30,7 +30,7 @@
     [xy-map {:x size-x :y size-y}]))
 
 (defn slurp-xy-map
-  "read the file as a 2d visual map and return a hashmap of coordinate -> character and its dimensions"
+  "read the file as a 2d visual map and return [hashmap of coord -> char, dimensions]"
   [file]
   (make-xy-map (slurp-strings file)))
 
