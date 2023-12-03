@@ -53,3 +53,31 @@
 (defn to-int-list [s]
   (map #(Integer/parseInt %) (str/split (str/trim s) #",")))
 
+(defn neighbors-4
+  [{:keys [x y]}]
+  [{:x (inc x) :y y}
+   {:x (dec x) :y y}
+   {:x x :y (inc y)}
+   {:x x :y (dec y)}])
+
+(defn neighbors-8
+  [{:keys [x y]}]
+
+  [{:x (dec x) :y (dec y)}
+   {:x x :y (dec y)}
+   {:x (inc x) :y (dec y)}
+
+   {:x (dec x) :y y}
+   ; {:x x :y y}
+   {:x (inc x) :y y}
+
+   {:x (dec x) :y (inc y)}
+   {:x x :y (inc y)}
+   {:x (inc x) :y (inc y)}])
+
+
+(defn left-of [c] (update c :x dec))
+(defn right-of [c] (update c :x inc))
+(defn top-of [c] (update c :y inc))
+(defn bottom-of [c] (update c :y dec))
+
