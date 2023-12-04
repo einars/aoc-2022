@@ -2,7 +2,6 @@
   (:require
     [clojure.test :as test :refer [deftest]]
     [clojure.set :as set]
-    [clojure.math :as math]
     [instaparse.core :as insta]
     [aoc.helpers :as h]))
 
@@ -16,7 +15,7 @@
 
 (def card-parser (insta/parser
                    "
-    <game> = <'Card'> <ws> int <':'> <ws> numbers <' | '> numbers
+    <game> = <'Card'> <ws> int <':'> <ws> numbers <ws> <'|'> <ws> numbers
     numbers = int (<ws> int)*
     <int> = #'\\d+'
     <ws> = #' +'
@@ -26,8 +25,7 @@
   (let [[n n1 n2] (card-parser s)]
     {:game (parse-long n)
      :n1 (set (mapv parse-long (drop 1 n1)))
-     :n2 (set (mapv parse-long (drop 1 n2)))
-     }))
+     :n2 (set (mapv parse-long (drop 1 n2)))}))
 
 (defn card-score [c]
   (let [matches (count (set/intersection (:n1 c) (:n2 c)))]
@@ -36,23 +34,47 @@
       1 1
       (reduce * (repeat (dec matches) 2)))))
 
-(card-score (parse-card (first sample-data)))
+(defn n-matches [c]
+  (count (set/intersection (:n1 c) (:n2 c))))
+
+(defn mark [extra-copies base-idx score]
+  (let [
+        cur-cards (inc (get extra-copies base-idx 0))
+        new-copies (update extra-copies  
+                     (+ base-idx score) 
+                     #(+ (or % 0) cur-cards))]
+    (if (= 1 score)
+      new-copies
+      (recur new-copies base-idx (dec score)))))
+
+(defn run-bun [[card & rest-cards] extra-copies idx]
+  (let [score (n-matches (parse-card card))]
+    (if (> score 0)
+      (recur rest-cards (mark extra-copies idx score) (inc idx))
+      (if (empty? rest-cards) 
+        extra-copies
+        (recur rest-cards extra-copies (inc idx))))))
 
 (defn solve-1
-  ([] (solve-1 (slurp "resources/2023/day4.txt")))
+  ([] (solve-1 (h/slurp-strings "resources/2023/day4.txt")))
   ([m] (->> m
          (mapv parse-card)
          (mapv card-score)
          (reduce +))))
 
 (defn solve-2
-  ([] (solve-2 (slurp "resources/2023/day4.txt")))
-  ([m] false))
+  ([] (solve-2 (h/slurp-strings "resources/2023/day4.txt")))
+  ([m] 
+   (->> (run-bun m {} 0)
+     vals
+     (reduce +)
+     (+ (count m))
+     )))
 
 (deftest test-stuff [] 
   (test/are [x y] (= x y)
     13 (solve-1 sample-data)
-    0 (solve-2 sample-data)
+    30 (solve-2 sample-data)
     ))
 
 (comment
