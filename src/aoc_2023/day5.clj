@@ -1,0 +1,112 @@
+(ns aoc-2023.day5
+  (:require
+    [clojure.test :as test :refer [deftest are]]
+    [clojure.string :as str]
+    [instaparse.core :as insta]
+    [aoc.helpers :as h]))
+
+(def input-file "resources/2023/day5.txt")
+
+(def sample-data "seeds: 79 14 55 13
+
+seed-to-soil map:
+50 98 2
+52 50 48
+
+soil-to-fertilizer map:
+0 15 37
+37 52 2
+39 0 15
+
+fertilizer-to-water map:
+49 53 8
+0 11 42
+42 0 7
+57 7 4
+
+water-to-light map:
+88 18 7
+18 25 70
+
+light-to-temperature map:
+45 77 23
+81 45 19
+68 64 13
+
+temperature-to-humidity map:
+0 69 1
+1 0 69
+
+humidity-to-location map:
+60 56 37
+56 93 4")
+
+(def sample-maps (drop 1 (str/split sample-data #"\n\n")))
+
+(def map-parser (insta/parser "
+    <map> = name <'-to-'> name <ws> <'map:'> <ws> ranges
+    <ranges> = range (<ws> range)*
+    range = int <ws> int <ws> int
+    <name> = #'[a-z]+'
+    <int> = #'\\d+'
+    <ws> = (' ' | '\n' | '\r')+
+    "))
+
+(defn parse-seeds [s]
+  (map parse-long (str/split (subs s 7) #" ")))
+
+(defn parse-map [m]
+  (let [parsed (map-parser m)
+        [from to & ranges] parsed]
+    (prn :from from :to to :ranges (count ranges))
+    {:from (keyword from)
+     :to (keyword to)
+     :ranges (mapv #(map parse-long (drop 1 %)) ranges)
+     }))
+
+(parse-seeds (first sample-maps))
+(parse-map (second sample-maps))
+
+(defn find-map [k maps]
+  (first (filter #(= (:from %) k) maps)))
+
+(defn transform [m n]
+  (if-let [[ds ss _len] (first (filter (fn [[_ds ss len]] (<= ss n (+ ss len))) (:ranges m)))]
+    (+ ds (- n ss))
+    n))
+
+(defn grow [what n maps]
+  (if (= :location what) n
+    (let [m (find-map what maps)]
+      (recur (:to m) (transform m n) maps))))
+
+;(grow :seed 79 (mapv parse-map sample-maps))
+
+(defn parse-input [s]
+  (let [[seeds & maps] (str/split s #"\n\n")
+        seeds (parse-seeds seeds)
+        maps (map parse-map maps)]
+    [seeds maps]))
+
+(defn solve-1
+  ([] (solve-1 (slurp input-file)))
+  ([m]  (let [[seeds maps] (parse-input m)]
+          (->> seeds
+            (mapv #(grow :seed % maps))
+            (apply min)))))
+
+
+(defn solve-2
+  ([] (solve-2 (h/slurp-strings input-file)))
+  ([m] (->> m
+         )))
+
+(deftest test-stuff [] 
+  (are [x y] (= x y)
+    82 (grow :seed 79 (mapv parse-map sample-maps))
+    35 (solve-1 sample-data)
+    0 (solve-2 sample-data)))
+
+(comment
+  (solve-1)
+  (solve-2))
