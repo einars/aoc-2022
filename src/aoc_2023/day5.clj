@@ -84,17 +84,16 @@ humidity-to-location map:
   [m [lo hi]] 
 
   (loop [n lo, accu []]
-    (let [delta (delta-at m n)]
-      (if-let [ix (next-intersect m n)]
-        ; a) we have range
-        (let [up-to (min (dec ix) hi)
-              new-accu (conj accu [(+ delta n) (+ delta up-to)])]
-          (if (= up-to hi)
-            new-accu
-            (recur (inc up-to) new-accu)))
-        ; b ) finish
-        (conj accu [(+ delta n) (+ delta hi)])))))
-
+    (if (> n hi)
+      accu
+      (let [delta (delta-at m n)
+            ix (next-intersect m n)
+            up-to (if ix 
+                    (min (dec ix) hi) 
+                    hi)]
+        (recur 
+          (inc up-to)
+          (conj accu [(+ delta n) (+ delta up-to)]))))))
 
 (defn grow [what n maps]
   (if (= :location what) n
@@ -107,10 +106,8 @@ humidity-to-location map:
       (recur (:to m) (mapcat #(transform-range m %) ranges) maps))))
 
 (defn parse-input [s]
-  (let [[seeds & maps] (str/split s #"\n\n")
-        seeds (parse-seeds seeds)
-        maps (map parse-map maps)]
-    [seeds maps]))
+  (let [[seeds & maps] (str/split s #"\n\n")]
+    [(parse-seeds seeds) (map parse-map maps)]))
 
 (defn parse-input-2 [s]
   (let [[seeds maps] (parse-input s)]
