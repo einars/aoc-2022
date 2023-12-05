@@ -56,7 +56,7 @@ humidity-to-location map:
   (map parse-long (str/split (subs s 7) #" ")))
 
 (defn parse-map [m]
-  (let [parsed (map-parser m)
+  (let [parsed (map-parser (str/trim m))
         [from to & ranges] parsed
         ranges (mapv #(map parse-long (drop 1 %)) ranges)]
     {:from (keyword from)
