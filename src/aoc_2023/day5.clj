@@ -57,36 +57,65 @@ humidity-to-location map:
 
 (defn parse-map [m]
   (let [parsed (map-parser m)
-        [from to & ranges] parsed]
-    (prn :from from :to to :ranges (count ranges))
+        [from to & ranges] parsed
+        ranges (mapv #(map parse-long (drop 1 %)) ranges)]
     {:from (keyword from)
      :to (keyword to)
-     :ranges (mapv #(map parse-long (drop 1 %)) ranges)
-     }))
-
-(parse-seeds (first sample-maps))
-(parse-map (second sample-maps))
+     :ranges ranges
+     :intersects (merge 
+                   (into {} (map (fn [[_ds ss len]] [(+ ss len) 0]) ranges))
+                   (into {} (map (fn [[ds ss _len]] [ss (- ds ss)]) ranges)))}))
 
 (defn find-map [k maps]
   (first (filter #(= (:from %) k) maps)))
 
+(defn delta-at [m n]
+  (if-let [idx (last (sort (filter #(<= % n) (keys (:intersects m)))))]
+    (get-in m [:intersects idx])
+    0))
+
 (defn transform [m n]
-  (if-let [[ds ss _len] (first (filter (fn [[_ds ss len]] (<= ss n (+ ss len))) (:ranges m)))]
-    (+ ds (- n ss))
-    n))
+  (+ n (delta-at m n)))
+
+(defn next-intersect [m n]
+  (first (sort (filter #(> % n) (keys (:intersects m))))))
+
+(defn transform-range 
+  [m [lo hi]] 
+
+  (loop [n lo, accu []]
+    (let [delta (delta-at m n)]
+      (if-let [ix (next-intersect m n)]
+        ; a) we have range
+        (let [up-to (min (dec ix) hi)
+              new-accu (conj accu [(+ delta n) (+ delta up-to)])]
+          (if (= up-to hi)
+            new-accu
+            (recur (inc up-to) new-accu)))
+        ; b ) finish
+        (conj accu [(+ delta n) (+ delta hi)])))))
+
 
 (defn grow [what n maps]
   (if (= :location what) n
     (let [m (find-map what maps)]
       (recur (:to m) (transform m n) maps))))
 
-;(grow :seed 79 (mapv parse-map sample-maps))
+(defn grow-ranges [what ranges maps]
+  (if (= :location what) ranges
+    (let [m (find-map what maps)]
+      (recur (:to m) (mapcat #(transform-range m %) ranges) maps))))
 
 (defn parse-input [s]
   (let [[seeds & maps] (str/split s #"\n\n")
         seeds (parse-seeds seeds)
         maps (map parse-map maps)]
     [seeds maps]))
+
+(defn parse-input-2 [s]
+  (let [[seeds maps] (parse-input s)]
+    [(mapv (fn [[a b]] [a (+ a b -1)]) (partition 2 seeds))
+     maps]))
 
 (defn solve-1
   ([] (solve-1 (slurp input-file)))
@@ -95,17 +124,19 @@ humidity-to-location map:
             (mapv #(grow :seed % maps))
             (apply min)))))
 
-
 (defn solve-2
-  ([] (solve-2 (h/slurp-strings input-file)))
-  ([m] (->> m
-         )))
+  ([] (solve-2 (slurp input-file)))
+  ([m]  (let [[seed-ranges maps] (parse-input-2 m)]
+          (->> 
+            (grow-ranges :seed seed-ranges maps)
+            (mapv first)
+            (apply min)))))
 
 (deftest test-stuff [] 
   (are [x y] (= x y)
     82 (grow :seed 79 (mapv parse-map sample-maps))
     35 (solve-1 sample-data)
-    0 (solve-2 sample-data)))
+    46 (solve-2 sample-data)))
 
 (comment
   (solve-1)
