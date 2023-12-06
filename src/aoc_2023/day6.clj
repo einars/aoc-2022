@@ -12,21 +12,18 @@
 (defn parse-1 [lines]
   (->> lines
     (take 2)
-    (map #(-> % (str/split #":") second (str/trim)))
-    (map #(str/split % #" +"))
+    (map #(-> % (str/split #":") second str/trim (str/split #" +")))
     (map #(map parse-long %))))
 
 (defn parse-2 [lines]
   (->> lines
     (take 2)
-    (map #(-> % (str/split #":") second (str/trim)))
-    (map #(str/replace % " " ""))
-    (map parse-long)))
+    (map #(-> % (str/split #":") second (str/replace " " "") parse-long))))
 
 (defn beats? [hold-time time dist]
   (> (* hold-time (- time hold-time)) dist))
 
-(defn solve-boat [[time dist]]
+(defn solve-boat [time dist]
   (reduce 
     (fn [score t] (+ score (if (beats? t time dist) 1 0)))
     0 
@@ -34,15 +31,14 @@
 
 (defn solve-1
   ([] (solve-1 (h/slurp-strings input-file)))
-  ([m] (->> m
-         parse-1 
-         (apply zipmap)
-         (mapv solve-boat)
+  ([m] (->>
+         (parse-1 m)
+         (apply mapv solve-boat)
          (reduce *))))
 
 (defn solve-2
   ([] (solve-2 (h/slurp-strings input-file)))
-  ([m] (solve-boat (parse-2 m))))
+  ([m] (apply solve-boat (parse-2 m))))
 
 (deftest test-stuff [] 
   (are [x y] (= x y)
