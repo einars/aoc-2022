@@ -43,64 +43,68 @@
    \K 13
    \A 14})
 
+(def joker? zero?)
+
 (defn q= [& xs]
-  (if (some zero? xs)
+  (if (some joker? xs)
     false
     (apply = xs)))
 
-(defn score-hand [[c1 c2 c3 c4 c5]]
-  (cond
-    (q= c1 c2 c3 c4 c5) [:five 7]
-    (q= c1 c2 c3 c4) [:four 6]
-    (q= c2 c3 c4 c5) [:four 6]
-    (and (q= c1 c2) (q= c3 c4 c5)) [:full-house 5]
-    (and (q= c1 c2 c3) (q= c4 c5)) [:full-house 5]
-    (q= c1 c2 c3) [:three 4]
-    (q= c2 c3 c4) [:three 4]
-    (q= c3 c4 c5) [:three 4]
-    (and (q= c1 c2) (q= c3 c4)) [:pairs 3]
-    (and (q= c1 c2) (q= c4 c5)) [:pairs 3]
-    (and (q= c2 c3) (q= c4 c5)) [:pairs 3]
-    (q= c1 c2) [:two 2]
-    (q= c2 c3) [:two 2]
-    (q= c3 c4) [:two 2]
-    (q= c4 c5) [:two 2]
-    :else [:one 1]))
+(def rank-5 7)
+(def rank-4 6)
+(def rank-3-2 5)
+(def rank-3 4)
+(def rank-2-2 3)
+(def rank-2 2)
+(def rank-1 1)
+
+(defn score-hand [hand]
+  (let [[c1 c2 c3 c4 c5] (sort > hand)]
+    (cond
+      (q= c1 c2 c3 c4 c5) rank-5
+      (q= c1 c2 c3 c4) rank-4
+      (q= c2 c3 c4 c5) rank-4
+      (and (q= c1 c2) (q= c3 c4 c5)) rank-3-2
+      (and (q= c1 c2 c3) (q= c4 c5)) rank-3-2
+      (q= c1 c2 c3) rank-3
+      (q= c2 c3 c4) rank-3
+      (q= c3 c4 c5) rank-3
+      (and (q= c1 c2) (q= c3 c4)) rank-2-2
+      (and (q= c1 c2) (q= c4 c5)) rank-2-2
+      (and (q= c2 c3) (q= c4 c5)) rank-2-2
+      (q= c1 c2) rank-2
+      (q= c2 c3) rank-2
+      (q= c3 c4) rank-2
+      (q= c4 c5) rank-2
+      :else rank-1)))
 
 (defn add-joker [rank]
   (condp = rank
-    1 2
-    2 4
-    3 5
-    4 6
-    5 6
-    7))
+    rank-1   rank-2   ; nothing    + J = a pair
+    rank-2   rank-3   ; a pair     + J = three
+    rank-2-2 rank-3-2 ; two pairs  + J = full-house
+    rank-3   rank-4   ; three      + J = four
+    rank-3-2 rank-4   ; full-house + J = four (won't ever happen)
+    rank-5            ; top out at five
+    ))
 
 (defn add-jokers [rank n]
   (if (zero? n)
     rank
-    (add-jokers (add-joker rank) (dec n))))
+    (recur (add-joker rank) (dec n))))
 
-(defn count-jokers [hand] (count (filter zero? hand)))
-
-(defn parse-card-sorted [s]
-  (sort > (mapv *card-mapping* s)))
-
-(defn parse-card-unsorted [s]
-  (mapv *card-mapping* s))
+(defn count-jokers [hand] (count (filter joker? hand)))
 
 (defn parse-line [s]
-  (let [[card, bid] (str/split s #" ")]
-    {:sorted (parse-card-sorted card)
-     :unsorted (parse-card-unsorted card)
-     :repr s
+  (let [[hand bid] (str/split s #" ")]
+    {:hand (map *card-mapping* hand)
      :bid (parse-long bid)}))
 
-(defn score-camel [{:keys [sorted unsorted] :as camel}]
-  (let [[name rank] (score-hand sorted)]
-    (assoc camel
-      :name name
-      :cmp (vec (concat [(add-jokers rank (count-jokers unsorted))] unsorted)))))
+(defn score-camel [{:keys [hand] :as camel}]
+  (assoc camel
+    :cmp (vec (cons
+                (add-jokers (score-hand hand) (count-jokers hand))
+                hand))))
 
 (defn solve-1
   ([] (solve-1 (h/slurp-strings input-file)))
@@ -113,16 +117,14 @@
          (reduce +))))
 
 (defn solve-2
-  ([] (solve-2 (h/slurp-strings input-file)))
-  ([m] 
-   (binding [*card-mapping* joker-mapping ] (solve-1 m))))
+  [& args] 
+  (binding [*card-mapping* joker-mapping ] (apply solve-1 args)))
 
 
 (deftest test-stuff [] 
   (are [x y] (= x y)
     6440 (solve-1 sample-data)
-    5905 (solve-2 sample-data)))
+    5905 (solve-2 sample-data)
+    250602641 (solve-1)
+    251037509 (solve-2)))
 
-(comment
-  (solve-1)
-  (solve-2))
