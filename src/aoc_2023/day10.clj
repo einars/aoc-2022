@@ -131,23 +131,6 @@
         coords (filterv #(inside? m trace %) coords)]
     (count coords)))
 
-(comment 
-  (def m (first (h/make-xy-map sample-data)))
-  (def m (first (h/make-xy-map sample-2)))
-  (def m (first (h/make-xy-map sample-3)))
-  (def m (first (h/slurp-xy-map input-file)))
-  (start-pos m)
-  (run-until-start m (start-pos m) :dn)
-  (count (run-until-start m (start-pos m) :lt))
-  (binding [*initial-direction* :dn]
-    (count-insides m))
-  (run-until-start m (start-pos m) :dn)
-  (h/print-map m)
-  (h/print-map (second (run-until-start m (start-pos m) :dn)))
-  (last (run-until-start m (start-pos m) :dn))
-  (exit-pos m {:x 0 :y 3} :dn)
-  (remove #(= % :up) #{:up :dn})
-  (h/print-map m))
 
 (defn solve-1
   ([] (solve-1 (first (h/slurp-xy-map input-file))))
@@ -155,7 +138,7 @@
          (run-until-start m (start-pos m) *initial-direction*)
          first
          count
-         (#(/ (inc %) 2)))))
+         (#(/ % 2)))))
 
 (defn solve-2
   ([] (solve-2 (first (h/slurp-xy-map input-file))))
@@ -164,7 +147,7 @@
 (deftest test-stuff [] 
   (are [x y] (= x y)
     8 (solve-1 (first (h/make-xy-map sample-data)))
-    0 (solve-2 sample-data)))
+    0 (binding [*initial-direction* :rt](solve-2 (first (h/make-xy-map sample-2))))))
 
 (comment
   (solve-1)

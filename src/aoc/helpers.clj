@@ -44,8 +44,8 @@
       (print "\n"))))
 
 (defn slurp-xy-map
-  "read the file as a 2d visual map and return [hashmap of coord -> char, dimensions]"
-  " 0 1 2 3 4 5 -> x
+  "read the file as a 2d visual map and return [hashmap of coord -> char, dimensions]
+   0 1 2 3 4 5 -> x
     1
     2
     3
