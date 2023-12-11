@@ -26,6 +26,7 @@
 (defn engine->sym-pattern [e]
   (set (mapcat symbol-neighbors e)))
 
+
 (defn number-starting-coords [e]
   (->> e
     (filterv (fn [[coords sym]]
