@@ -14,9 +14,15 @@
    "????.######..#####. 1,6,5"
    "?###???????? 3,2,1"])
 
+(def ^:dynamic *unfold* identity)
+
+(defn unfold-2 [[d groups]]
+  [(str/join "?" (repeat 5 d))
+   (str/join "," (repeat 5 groups))])
 
 (defn parse-problem [s]
-  (let [[d groups] (str/split s #" ")]
+  (let [[d groups] (str/split s #" ")
+        [d groups] (*unfold* [d groups])]
     {:length (count d)
      :empty (vec (keep-indexed (fn [idx item] (when (= item \.) idx)) d))
      :filled (vec (keep-indexed (fn [idx item] (when (= item \#) idx)) d))
@@ -24,55 +30,49 @@
 
 (defn contradicts? [start-pos len prob]
   (or
+    (> (+ start-pos len) (:length prob))
     (some #(<= start-pos % (+ start-pos len -1)) (:empty prob))
     (some #{(dec start-pos) (+ start-pos len)} (:filled prob))))
 
-(defn all-ok? [accum prob]
-  (let [bitmap (set (mapcat (fn [[pos len]] (range pos (+ pos len))) accum))
-        res (not (some (complement bitmap) (:filled prob)))]
+(def n-arrangements)
 
-    (when res
-      (prn :check accum :bmp bitmap (:filled prob) :res)
-      )
-    res))
-    
-
-(defn apply-groups 
-  ([prob callback] (apply-groups prob callback 0 (:groups prob) []))
-  ([prob callback start items accum]
+(defn n-arrangements-n
+  ([prob] (n-arrangements prob 0 (:groups prob)))
+  ([prob start items]
    (if-not (seq items)
-     (when (all-ok? accum prob)
-       (callback accum))
-
+     (if (some (fn [n] (when (>= n start) n)) (:filled prob)) 0 1)
      (let [n (first items)]
-       ;(prn :doseq start :to  )
-       (doseq [start-pos (range start (inc (- (:length prob) (apply + items) (dec (count items)))))]
-         (when-not (contradicts? start-pos n prob)
-           (apply-groups prob callback (+ start-pos n 1) (rest items) (conj accum [start-pos n]))) ) ) ) ) )
+       (reduce +
+         (for [start-pos (range start 
+                           (inc (or 
+                                  (some (fn [n] (when (>= n start) n)) (:filled prob)) ; next absolutely filled
+                                  (- (:length prob) (apply + items) (dec (count items)))))) ; theoretical max
+               :when (not (contradicts? start-pos n prob))]
+           (n-arrangements prob (+ start-pos n 1) (rest items))))))))
+
+(def n-arrangements (memoize n-arrangements-n))
+;(def n-arrangements n-arrangements-n)
 
 
-(defn n-arrangements [prob-s]
-  (let [results (atom [])]
-    (apply-groups (parse-problem prob-s) #(swap! results conj %))
-    ;@results
-    (count @results)))
 
 (defn solve-1
   ([] (solve-1 (h/slurp-strings input-file)))
   ([m] (->> m
+         (map parse-problem)
          (map n-arrangements)
-         (apply +))))
+         (apply +)
+         )))
 
 (defn solve-2
   ([] (solve-2 (h/slurp-strings input-file)))
-  ([m] (->> m
-         )))
+  ([m] (binding [*unfold* unfold-2] (solve-1 m))))
 
 (deftest test-stuff [] 
   (are [x y] (= x y)
-    10 (n-arrangements "?###???????? 3,2,1")
+    10 (n-arrangements (parse-problem "?###???????? 3,2,1"))
+    3 (n-arrangements (parse-problem ".??#?????.???????# 4,5,2"))
     21 (solve-1 sample-data)
-    0 (solve-2 sample-data)))
+    525152 (solve-2 sample-data)))
 
 (comment
   (solve-1)
