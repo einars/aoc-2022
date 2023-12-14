@@ -55,6 +55,15 @@
   [file]
   (make-xy-map (slurp-strings file)))
 
+(defn string->map [f]
+  (-> f (str/split #"\n") make-xy-map first))
+
+(defn slurp-map 
+  "slurp-xy-map returns map and dimensions. i generally never need dimensions"
+  [f]
+  (-> f slurp string->map))
+
+
 (defn zip [& xs] (apply map vector xs))
 
 (defn indexed [xs]
@@ -66,13 +75,13 @@
   (map edn/read-string (slurp-strings file)))
 
 (defn find-keys [pred m]
-  (map first (filter (fn [[_k v]] (pred v)) m)))
+  (mapv first (filterv (fn [[_k v]] (pred v)) m)))
 
 (defn find-vals [pred m]
-  (map second (filter (fn [[_k v]] (pred v)) m)))
+  (mapv second (filter (fn [[_k v]] (pred v)) m)))
 
 (defn to-int-list [s]
-  (map #(Integer/parseInt %) (str/split (str/trim s) #",")))
+  (mapv #(Integer/parseInt %) (str/split (str/trim s) #",")))
 
 (defn neighbors-4
   [{:keys [x y]}]
@@ -99,6 +108,14 @@
 
 (defn left-of [c] (update c :x dec))
 (defn right-of [c] (update c :x inc))
-(defn top-of [c] (update c :y inc))
-(defn bottom-of [c] (update c :y dec))
+(defn top-of [c] (update c :y dec))
+(defn bottom-of [c] (update c :y inc))
 
+(def moves 
+  {:lt left-of
+   :rt right-of
+   :up top-of
+   :dn bottom-of})
+
+(defn move [c dir]
+  ((get moves dir identity) c))

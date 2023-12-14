@@ -100,7 +100,7 @@
 (deftest test-stuff [] 
   (are [x y] (= x y)
     405 (solve-1 (read-maps sample-input))
-    0 (solve-2 (read-maps sample-input))))
+    400 (solve-2 (read-maps sample-input))))
 
 (comment
   (solve-1)
