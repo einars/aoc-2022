@@ -46,7 +46,8 @@ O.#..O.#.#
       (recur nm dir))))
 
 (defn spin-cycle [m]
-  (prn :spin)
+  (print ".")
+  (flush)
   (-> m
     (fall-forever :up)
     (fall-forever :lt)
@@ -56,17 +57,11 @@ O.#..O.#.#
 
 (defn calc-spin [m times]
   (let [all-ms (iterate spin-cycle m)]
-
     (loop [[m & ms] all-ms, n 0, seen {}]
       (if-let [cycle-start (seen m)]
         (do
           (prn :cycle-found cycle-start n :len (- n cycle-start))
-          (prn :mod (- times cycle-start) (- n cycle-start))
-          (prn :nth (inc (mod (- times cycle-start) (- n cycle-start))))
-          (nth all-ms (+ n (mod (- times cycle-start) (- n cycle-start))))
-          ; fast-forward to (times - cycle-start) % cycle-len 
-
-          )
+          (nth all-ms (+ n (mod (- times cycle-start) (- n cycle-start)))))
         (recur ms (inc n) (assoc seen m n))))))
 
 (defn score [m]
