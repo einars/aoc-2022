@@ -51,7 +51,7 @@
 
 (deftest test-stuff [] 
   (are [x y] (= x y)
-    12 (predict [0 3 6 9 12 15])
+    18 (predict [0 3 6 9 12 15])
     -3 (binding [*count-op* count-solution-2] (predict [0 3 6 9 12 15]))
     5 (binding [*count-op* count-solution-2] (predict [10 13 16 21 30 45]))
     114 (solve-1 sample-data)
