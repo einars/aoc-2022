@@ -70,6 +70,10 @@
   (let [n (count xs)]
     (map vector (range n) xs)))
 
+(defn indexed-1 [xs]
+  (let [n (count xs)]
+    (map vector (range 1 (inc n)) xs)))
+
 (defn slurp-ints [file]
   ; use end/read-string as a general way to avoid Integer/parseInt being unable to read bigints etc
   (map edn/read-string (slurp-strings file)))

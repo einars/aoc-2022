@@ -95,6 +95,7 @@ O.#..O.#.#
     136 (solve-1 (h/string->map sample-data))
     64 (solve-2 (h/string->map sample-data))))
 
+
 (comment
   (solve-1)
   (solve-2))
