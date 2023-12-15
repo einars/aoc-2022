@@ -92,33 +92,15 @@
 
 (def ^:dynamic *initial-direction* :rt)
 
-(defn out-x [cur ch]
-  (cond
-    (and (= cur :out) (= \| ch)) :in
-    (and (= cur :in)  (= \| ch)) :out
-    (and (= cur :out) (= \F ch)) :out-F
-    (and (= cur :out) (= \L ch)) :out-L
-    (and (= cur :in) (= \F ch)) :in-F
-    (and (= cur :in) (= \L ch)) :in-L
-    (and (= cur :out-F) (= \J ch)) :in
-    (and (= cur :out-F) (= \7 ch)) :out
-    (and (= cur :out-L) (= \J ch)) :out
-    (and (= cur :out-L) (= \7 ch)) :in
-    (and (= cur :in-F) (= \J ch)) :out
-    (and (= cur :in-F) (= \7 ch)) :in
-    (and (= cur :in-L) (= \J ch)) :in
-    (and (= cur :in-L) (= \7 ch)) :out))
-
 (defn inside? [m trace {:keys [x y]}]
-  (let [lefts (->> trace
-                (filterv #(= (:y %) y))
-                (filterv #(< (:x %) x))
-                (sort-by (fn [elt] [(:x elt) (:y elt)]))
-                (mapv m)
-                (filterv #{\| \L \F \J \7})
-                (reduce out-x :out))
-        ]
-    (#{:in-F :in-L :in} lefts)))
+  (let [crosses (->> trace
+                  (filterv #(= (:y %) y))
+                  (filterv #(< (:x %) x))
+                  (sort-by (fn [elt] [(:x elt) (:y elt)]))
+                  (mapv m)
+                  (filterv #{\| \L \J})
+                  count)]
+    (= 1 (mod crosses 2))))
 
 (defn count-insides [m]
   (let [sxy (start-pos m)
@@ -147,7 +129,7 @@
 (deftest test-stuff [] 
   (are [x y] (= x y)
     8 (solve-1 (first (h/make-xy-map sample-data)))
-    0 (binding [*initial-direction* :rt](solve-2 (first (h/make-xy-map sample-2))))))
+    8 (binding [*initial-direction* :rt](solve-2 (first (h/make-xy-map sample-2))))))
 
 (comment
   (solve-1)
