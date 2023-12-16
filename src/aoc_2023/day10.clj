@@ -96,7 +96,7 @@
   (let [crosses (->> trace
                   (filterv #(= (:y %) y))
                   (filterv #(< (:x %) x))
-                  (sort-by (fn [elt] [(:x elt) (:y elt)]))
+                  (sort-by :x)
                   (mapv m)
                   (filterv #{\| \L \J})
                   count)]
