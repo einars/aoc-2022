@@ -44,7 +44,9 @@
 
 (defn enlighten 
 
-  ([m] (binding [*dims* (h/map-dimensions m)] (enlighten m [[{:x 0 :y 0} :rt]] {})))
+  ([m]
+   (binding [*dims* (h/map-dimensions m)]
+     (enlighten m [[{:x 0 :y 0} :rt]] {})))
 
   ([m coordirs visited]
 
@@ -62,30 +64,36 @@
        visited
        (recur m new-coordirs new-visited)))))
 
+(defn enlighten-count [m starting-pos]
+  (binding [*dims* (h/map-dimensions m)]
+    (->> (enlighten m [starting-pos] {}) (map first) set count)))
+
+(defn starting-poses [m]
+  (let [{:keys [xmin xmax ymin ymax]} (h/map-dimensions m)]
+    (concat
+      (for [x (range xmin (inc xmax))] [{:x x :y 0} :dn])
+      (for [x (range xmin (inc xmax))] [{:x x :y ymax} :up])
+      (for [y (range ymin (inc ymax))] [{:x 0 :y y} :rt])
+      (for [y (range ymin (inc ymax))] [{:x xmax :y y} :lt]))))
+
 (defn print-light [enl]
   (h/print-map (into {} (mapv (fn [x] [x \#]) (map first enl)))))
 
 (print-light (enlighten sample-map))
 
 
-
 (defn solve-1
   ([] (solve-1 (h/slurp-map input-file)))
-  ([m] (->> m
-         enlighten
-         (map first)
-         set
-         count)))
+  ([m] (enlighten-count m [{:x 0 :y 0} :rt])))
 
 (defn solve-2
-  ([] (solve-2 (h/slurp-strings input-file)))
-  ([m] (->> m
-         )))
+  ([] (solve-2 (h/slurp-map input-file)))
+  ([m] (apply max (mapv #(enlighten-count m %) (starting-poses m)))))
 
 (deftest test-stuff [] 
   (are [x y] (= x y)
     46 (solve-1 sample-map)
-    0 (solve-2 sample-map)))
+    51 (solve-2 sample-map)))
 
 (comment
   (solve-1)
