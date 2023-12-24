@@ -1,10 +1,6 @@
-(ns aoc-2023.day13
-  (:require
-    [clojure.test :as test :refer [deftest are]]
-    [clojure.string :as str]
-    [clojure.pprint :as pprint]
-    [clojure.set :as set]
-    [aoc.helpers :as h]))
+(ns aoc-2023.day13(:require[clojure.test :as test :refer [deftest are]]
+[clojure.string :as str][clojure.pprint :as pprint][clojure.set :as set]
+[aoc.helpers :as h]))
 
 (def sample-input "resources/2023/day13.sample.txt")
 (def input-file "resources/2023/day13.txt")
