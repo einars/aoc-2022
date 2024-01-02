@@ -1,6 +1,7 @@
 (ns aoc-2023.day24
   (:require
     [clojure.test :as test :refer [deftest are]]
+    [clojure.java.shell :refer [sh]]
     [clojure.string :as str]
     [clojure.walk :as walk]
     [clojure.core.match :refer [match]]
@@ -26,6 +27,68 @@
     "))
 
 
+(defn read-octave-sym [m s]
+  (let [[v val] (str/split s #" = \(sym\) ")]
+    (if val
+      (assoc m (keyword v) (parse-long val))
+      m
+      )))
+
+(defn parse-eqn-octave-output [s]
+  (prn s)
+  (reduce read-octave-sym {} (str/split s #"\n")))
+
+(defn solve-eqn 
+  "
+Finds ptA, dptA, a solution for 
+ /
+ | pt0 + t0 * dpt0 = ptA + t0 * dptA
+<  pt1 + t1 * dpt1 = ptA + t1 * dptA
+ | pt2 + t2 * dpt2 = ptA + t2 * dptA
+ \\
+
+ Outsource solving to octave.
+
+  "
+  [pt0 pt1 pt2]
+  (let [{x0 :x, y0 :y, z0 :z, dx0 :dx, dy0 :dy, dz0 :dz} pt0
+        {x1 :x, y1 :y, z1 :z, dx1 :dx, dy1 :dy, dz1 :dz} pt1 
+        {x2 :x, y2 :y, z2 :z, dx2 :dx, dy2 :dy, dz2 :dz} pt2 ]
+
+    (spit "/tmp/aoc-24.m" (str/join "\n" 
+                            ["pkg load symbolic;"
+                             "syms t0 t1 t2 x y z dx dy dz;"
+                             (format " x0 = %d;  y0 = %d;  z0 = %d;" x0 y0 z0)
+                             (format "dx0 = %d; dy0 = %d; dz0 = %d;" dx0 dy0 dz0)
+                             (format " x1 = %d;  y1 = %d;  z1 = %d;" x1 y1 z1)
+                             (format "dx1 = %d; dy1 = %d; dz1 = %d;" dx1 dy1 dz1)
+                             (format " x2 = %d;  y2 = %d;  z2 = %d;" x2 y2 z2)
+                             (format "dx2 = %d; dy2 = %d; dz2 = %d;" dx2 dy2 dz2)
+                             "s = solve(..."
+                             "  x0 + t0 * dx0 == x + t0 * dx, ..."
+                             "  y0 + t0 * dy0 == y + t0 * dy, ..."
+                             "  z0 + t0 * dz0 == z + t0 * dz, ..."
+                             "  x1 + t1 * dx1 == x + t1 * dx, ..."
+                             "  y1 + t1 * dy1 == y + t1 * dy, ..."
+                             "  z1 + t1 * dz1 == z + t1 * dz, ..."
+                             "  x2 + t2 * dx2 == x + t2 * dx, ..."
+                             "  y2 + t2 * dy2 == y + t2 * dy, ..."
+                             "  z2 + t2 * dz2 == z + t2 * dz, ..."
+                             "  x, dx, y, dy, z, dz, t0, t1, t2);"
+                             "x = s.x"
+                             "y = s.y"
+                             "z = s.z"
+                             "dx = s.dx"
+                             "dy = s.dy"
+                             "dz = s.dz"]))
+    (parse-eqn-octave-output (:out (sh "octave" "/tmp/aoc-24.m")))))
+
+
+(defn print-solution-2 [{x :x y :y z :z :as s}]
+  (prn :stone s)
+  (+ x y z))
+
+
 (defn parse-hailstone [s]
   (let [e (->> (hs-parser s)
             (walk/postwalk (fn [elt] 
@@ -37,8 +100,6 @@
                                :else elt))))]
     (when-not e (throw (Exception. (format "Unable to parse: %s" e))))
     e ))
-
-(parse-hailstone "19, 13, 30 @ -2,  1, -2")
 
 (defn intersect-xy [ha hb]
 
@@ -89,7 +150,10 @@
 (defn solve-2
   ([] (solve-2 (h/slurp-strings input-file)))
   ([m] (->> m
-         )))
+         (take 3)
+         (mapv parse-hailstone)
+         (apply solve-eqn)
+         print-solution-2)))
 
 
 (deftest test-stuff [] 
@@ -101,9 +165,8 @@
     2 (find-crashes
         (mapv parse-hailstone (str/split sample-data #"\n"))
         [7 27])
-
-    ;0 (solve-1 sample-data)
-    ;0 (solve-2 sample-data)
+    {:a -1, :b 13} (parse-eqn-octave-output "xxx\na = (sym) -1\nb = (sym) 13\n")
+    47 (solve-2 (str/split sample-data #"\n"))
     ))
 
 (comment
