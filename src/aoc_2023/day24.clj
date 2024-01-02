@@ -31,8 +31,7 @@
   (let [[v val] (str/split s #" = \(sym\) ")]
     (if val
       (assoc m (keyword v) (parse-long val))
-      m
-      )))
+      m)))
 
 (defn parse-eqn-octave-output [s]
   (prn s)
@@ -51,37 +50,29 @@ Finds ptA, dptA, a solution for
 
   "
   [pt0 pt1 pt2]
+
   (let [{x0 :x, y0 :y, z0 :z, dx0 :dx, dy0 :dy, dz0 :dz} pt0
         {x1 :x, y1 :y, z1 :z, dx1 :dx, dy1 :dy, dz1 :dz} pt1 
         {x2 :x, y2 :y, z2 :z, dx2 :dx, dy2 :dy, dz2 :dz} pt2 ]
-
-    (spit "/tmp/aoc-24.m" (str/join "\n" 
-                            ["pkg load symbolic;"
-                             "syms t0 t1 t2 x y z dx dy dz;"
-                             (format " x0 = %d;  y0 = %d;  z0 = %d;" x0 y0 z0)
-                             (format "dx0 = %d; dy0 = %d; dz0 = %d;" dx0 dy0 dz0)
-                             (format " x1 = %d;  y1 = %d;  z1 = %d;" x1 y1 z1)
-                             (format "dx1 = %d; dy1 = %d; dz1 = %d;" dx1 dy1 dz1)
-                             (format " x2 = %d;  y2 = %d;  z2 = %d;" x2 y2 z2)
-                             (format "dx2 = %d; dy2 = %d; dz2 = %d;" dx2 dy2 dz2)
-                             "s = solve(..."
-                             "  x0 + t0 * dx0 == x + t0 * dx, ..."
-                             "  y0 + t0 * dy0 == y + t0 * dy, ..."
-                             "  z0 + t0 * dz0 == z + t0 * dz, ..."
-                             "  x1 + t1 * dx1 == x + t1 * dx, ..."
-                             "  y1 + t1 * dy1 == y + t1 * dy, ..."
-                             "  z1 + t1 * dz1 == z + t1 * dz, ..."
-                             "  x2 + t2 * dx2 == x + t2 * dx, ..."
-                             "  y2 + t2 * dy2 == y + t2 * dy, ..."
-                             "  z2 + t2 * dz2 == z + t2 * dz, ..."
-                             "  x, dx, y, dy, z, dz, t0, t1, t2);"
-                             "x = s.x"
-                             "y = s.y"
-                             "z = s.z"
-                             "dx = s.dx"
-                             "dy = s.dy"
-                             "dz = s.dz"]))
-    (parse-eqn-octave-output (:out (sh "octave" "/tmp/aoc-24.m")))))
+    (-> (sh "octave" 
+          :in (str/join "\n"
+                ["pkg load symbolic;"
+                 "syms t0 t1 t2 x y z dx dy dz;"
+                 "s = solve("
+                 (format "  %d + t0 * %d == x + t0 * dx," x0 dx0)
+                 (format "  %d + t0 * %d == y + t0 * dy," y0 dy0)
+                 (format "  %d + t0 * %d == z + t0 * dz," z0 dz0)
+                 (format "  %d + t1 * %d == x + t1 * dx," x1 dx1)
+                 (format "  %d + t1 * %d == y + t1 * dy," y1 dy1)
+                 (format "  %d + t1 * %d == z + t1 * dz," z1 dz1)
+                 (format "  %d + t2 * %d == x + t2 * dx," x2 dx2)
+                 (format "  %d + t2 * %d == y + t2 * dy," y2 dy2)
+                 (format "  %d + t2 * %d == z + t2 * dz," z2 dz2)
+                 "  x, dx, y, dy, z, dz, t0, t1, t2);"
+                 "x = s.x, y = s.y, z = s.z"
+                 "dx = s.dx, dy = s.dy, dz = s.dz"]))
+      :out
+      parse-eqn-octave-output)))
 
 
 (defn print-solution-2 [{x :x y :y z :z :as s}]
