@@ -21,18 +21,42 @@
   [s]
   (mapv parse-report (str/split s #"\n")))
 
+(defn safe-mode [[a b]]
+  (condp = (- a b)
+    1 :inc
+    2 :inc
+    3 :inc
+    -1 :dec
+    -2 :dec
+    -3 :dec
+    nil))
+
 (defn safe-report? 
   [xs]
-  (let [deltas (mapv abs (mapv - (partition 2 1 xs)))]
-    (= 1 (count (set deltas)))))
+  (let [deltas (mapv safe-mode (partition 2 1 xs))]
+    (and 
+      (= 1 (count (set deltas)))
+      (not (some nil? deltas)))))
+
+(defn drop-nth
+  [n xs]
+  (concat (take n xs) (nthrest xs (inc n))))
+
+(defn safe-report-pt2? 
+  [xs]
+  (let [variations (mapv #(drop-nth % xs) (range (count xs)))]
+    (some safe-report? variations)))
+
+(mapv safe-report-pt2? (parse-input sample))
 
 (defn pt1
   [task]
-  )
+  (count (filterv safe-report? task)))
 
 (defn pt2
   [task]
-  0)
+  (count (filterv safe-report-pt2? task)))
+
 
 (defn solve-1
   ([] (solve-1 (slurp "resources/2024/day2.txt")))
@@ -46,8 +70,12 @@
   (are [x y] (= x y)
     true (safe-report? [7 6 4 2 1])
     false (safe-report? [1 2 7 8 9])
-    1 (pt1 (parse-input sample))
-    2 (pt2 (parse-input sample))))
+    false (safe-report? [1 10 20])
+    true (safe-report-pt2? [7 6 4 2 1])
+    true (safe-report-pt2? [1 3 2 4 5])
+    nil  (safe-report-pt2? [1 2 7 8 9])
+    2 (pt1 (parse-input sample))
+    4 (pt2 (parse-input sample))))
 
 (comment
   (solve-1)
