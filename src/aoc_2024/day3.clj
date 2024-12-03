@@ -11,17 +11,23 @@
 (def sample-2
   "xmul(2,4)&mul[3,7]!^don't()_mul(5,5)+mul(32,64](mul(11,8)undo()?mul(8,5))")
 
+(def parser (insta/parser "
+  <input> = (mul | do | dont | <crap>)*
+  crap = !(mul | do | dont) (#'.' | '\\r' | '\\n')
+  mul = <'mul('> int <','> int <')'>
+  do = <'do()'>
+  dont = <'don\\'t()'>
+  int = #'\\d+'
+  "))
+
 
 (defn parse-input
   [s]
   (mapv (fn [[x a b]]
-          (condp = x
-            "do()" [:do]
-            "don't()" [:dont]
-
-            [:mul (parse-long a) (parse-long b)]))
-    (re-seq #"mul\((\d+),(\d+)\)|do\(\)|don't\(\)" s)))
-
+          (if
+            (= :mul x) [:mul (parse-long (second a)) (parse-long (second b))]
+            [x]))
+    (parser s)))
 
 (defn pt1
   [task]
@@ -53,6 +59,8 @@
   (are [x y] (= x y)
     161 (pt1 (parse-input sample))
     48 (pt2 (parse-input sample-2))))
+
+
 
 (comment
   (solve-1)
