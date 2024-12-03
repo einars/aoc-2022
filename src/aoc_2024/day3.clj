@@ -14,13 +14,22 @@
 
 (defn parse-input
   [s]
-  (mapv (fn [[_ a b]]
-          [(parse-long a) (parse-long b)])
+  (mapv (fn [[x a b]]
+          (condp = x
+            "do()" [:do]
+            "don't()" [:dont]
+
+            [:mul (parse-long a) (parse-long b)]))
     (re-seq #"mul\((\d+),(\d+)\)|do\(\)|don't\(\)" s)))
 
-(defn filter-pt-2
-  ([xs] 
-   (filter-pt-2 xs [] true))
+
+(defn pt1
+  [task]
+  (reduce + (mapv (fn [[cmd a b]] (if (#{:mul} cmd) (* a b) 0)) task)))
+
+(defn pt2
+  ([xs]
+   (pt2 xs 0 true))
   ([[[cmd x y] & rest] accu do?]
    (if (nil? cmd)
      accu
@@ -28,26 +37,9 @@
      (condp = cmd
        :do (recur rest accu true)
        :dont (recur rest accu false)
-       :mul (recur rest 
-              (if do? (conj accu (* x y)) accu)
+       :mul (recur rest
+              (if do? (+ accu (* x y)) accu)
               do?)))))
-
-(defn parse-input-2
-  [s]
-  (mapv (fn [[x a b]]
-          (cond
-            (= x "do()") [:do]
-            (= x "don't()") [:dont]
-            :else [:mul (parse-long a) (parse-long b)]))
-    (re-seq #"mul\((\d+),(\d+)\)|do\(\)|don't\(\)" s)))
-
-(defn pt1
-  [task]
-  (reduce + (mapv (fn [[a b]] (* a b)) task)))
-
-(defn pt2
-  [task]
-  (reduce + (filter-pt-2 task)))
 
 (defn solve-1
   ([] (solve-1 (slurp "resources/2024/day3.txt")))
@@ -55,12 +47,12 @@
 
 (defn solve-2
   ([] (solve-2 (slurp "resources/2024/day3.txt")))
-  ([ss] (pt2 (parse-input-2 ss))))
+  ([ss] (pt2 (parse-input ss))))
 
 (deftest tests []
   (are [x y] (= x y)
     161 (pt1 (parse-input sample))
-    48 (pt2 (parse-input-2 sample-2))))
+    48 (pt2 (parse-input sample-2))))
 
 (comment
   (solve-1)
