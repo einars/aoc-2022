@@ -1,4 +1,4 @@
-(ns aoc-2024.dayX
+(ns aoc-2024.day4
   (:require
    [clojure.test :as test :refer [deftest is are]]
    [clojure.tools.trace :refer :all]
@@ -67,8 +67,7 @@ MXMXAXMASX
     (apply + (map count-xmas (all-diag-1 task)))
     (apply + (map count-xmas (all-diag-2 task)))))
 
-(deftrace is-mas? [n]
-  (#{"MASMAS" "MASSAM" "SAMMAS" "SAMSAM"} n))
+(def is-mas? #{"MASMAS" "MASSAM" "SAMMAS" "SAMSAM"})
 
 (defn pt2 [[lines n]]
   (count 
@@ -85,13 +84,6 @@ MXMXAXMASX
               (get-in lines [x y])
               (get-in lines [(inc x) (dec y)]))))))))
 
-(pt1 (parse-input sample))
-(pt2 (parse-input sample))
-(all-diag-2 (parse-input sample))
-
-
-(pt1 (parse-input (slurp "resources/2024/day4.txt")))
-
 (defn solve-1
   ([] (solve-1 (slurp "resources/2024/day4.txt")))
   ([ss] (pt1 (parse-input ss))))
@@ -102,8 +94,8 @@ MXMXAXMASX
 
 (deftest tests []
   (are [x y] (= x y)
-    1 (pt1 (parse-input sample))
-    2 (pt2 (parse-input sample))))
+    18 (pt1 (parse-input sample))
+    9 (pt2 (parse-input sample))))
 
 (comment
   (solve-1)
