@@ -21,7 +21,7 @@
 ......#..."))
 
 (defn parse-input [s]
-  (let [[area dimensions] (-> s (str/split #"\n") h/make-xy-map)
+  (let [[area dimensions] (-> s (str/split #"\n\r") h/make-xy-map)
         pos (first (filter (comp #{\^} area) (keys area)))]
     {:dimensions dimensions
      :pos pos
@@ -48,12 +48,10 @@
   ([task] (walk-until-outside task #{}))
   ([{:keys [direction pos obstacles visited] :as task} turns]
 
-   (prn :task task :turns turns)
-
    (let [npos (h/move pos direction)]
      (cond
 
-       (turns [pos direction]) nil
+       (turns [npos direction]) nil
 
        (obstacles npos) (recur (update task :direction turn-right) (conj turns [pos direction]))
 
@@ -71,10 +69,9 @@
          ; skip initial pos
          path (disj path (:pos task))]
 
-     (filter (fn [pos] (walk-until-outside (update task :obstacles #(conj % pos))))) path)))
+     (filter (fn [pos] 
+               (nil? (walk-until-outside (update task :obstacles #(conj % pos))))) path))))
 
-(boxen-solve (parse-input sample))
-(count (boxen-solve (parse-input sample)))
 
 (comment defn would-loop?
   [{:keys [obstacles pos direction] :as task} visited]
@@ -123,10 +120,8 @@
 
 (defn pt2
   [task]
-  (count (walk-gather-loops task)))
+  (count (boxen-solve task)))
 
-;(walk-gather-loops (parse-input sample))
-(walk-until-outside (parse-input sample))
 
 
 (defn solve-1
@@ -140,8 +135,12 @@
 (deftest tests []
   (are [x y] (= x y)
     41 (pt1 (parse-input sample))
-    6 (pt2 (parse-input sample))))
+    6    (pt2 (parse-input sample))
+    1424 (pt2 (parse-input (slurp input)))
+    ))
 
+(pt1 (parse-input (slurp "/home/e/draza/karlis-day6/in.text")))
+(pt2 (parse-input (slurp "/home/e/draza/karlis-day6/in.text")))
 (comment
   (solve-1)
   (solve-2))
