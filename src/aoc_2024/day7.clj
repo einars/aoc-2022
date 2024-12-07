@@ -1,0 +1,83 @@
+(ns aoc-2024.day7
+  (:require
+   [clojure.test :as test :refer [deftest is are]]
+   [instaparse.core :as insta]
+   [clojure.string :as str]
+   [aoc.helpers :as h]))
+
+(def input-txt "resources/2024/day7.txt")
+
+(def sample
+  "190: 10 19
+3267: 81 40 27
+83: 17 5
+156: 15 6
+7290: 6 8 6 15
+161011: 16 10 13
+192: 17 8 14
+21037: 9 7 18 13
+292: 11 6 16 20")
+
+(def parser (insta/parser "
+<task>   = equation (<nl> equation)* <nl>?
+equation = target <': '> numbers
+numbers  = int (<' '> int)+
+target   = int
+int      = #'\\d+'
+nl       = '\n'
+"))
+
+(defn parse-tree
+  [t]
+  (condp = (first t)
+    :target {:target (second t)}
+    :numbers {:numbers (vec (next t))}
+    :equation (into {} (parse-tree (next t)))
+    (mapv parse-tree t)))
+
+
+(defn parse-input [t]
+  (parse-tree (h/tree-parse-int (parser t))))
+
+
+(defn solve-eqn
+  ([{:keys [target numbers]}]
+   (solve-eqn target (reverse numbers) []))
+  ([target [n & rest] accu]
+
+   (if-not rest
+     (when (= target n) (conj accu n))
+     (or (solve-eqn (- target n) rest (conj accu "+" n))
+       (when (= 0 (mod target n))
+         (solve-eqn (/ target n) rest (conj accu "*" n)))))))
+
+(defn pt1
+  [task]
+  (->> task
+    (mapv (fn [t] (assoc t :solution (solve-eqn t))))
+    (filterv :solution)
+    (mapv :target)
+    (reduce +)))
+
+;(pt1 (parse-problem sample))
+
+(defn pt2
+  [task]
+  0)
+
+(defn solve-1
+  ([] (solve-1 (slurp input-txt)))
+  ([ss] (pt1 (parse-input ss))))
+
+(defn solve-2
+  ([] (solve-2 (slurp input-txt)))
+  ([ss] (pt2 (parse-input ss))))
+
+(deftest tests []
+  (are [x y] (= x y)
+    3749 (pt1 (parse-input sample))
+    2 (pt2 (parse-input sample))))
+
+(comment
+  (solve-1)
+  (solve-2))

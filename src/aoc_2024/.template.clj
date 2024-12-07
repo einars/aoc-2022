@@ -4,6 +4,8 @@
    [clojure.string :as str]
    [aoc.helpers :as h]))
 
+(def input-txt "resources/2024/day6.txt")
+
 (def sample
   "")
 
@@ -20,11 +22,11 @@
   0)
 
 (defn solve-1
-  ([] (solve-1 (slurp "resources/2024/dayX.txt")))
+  ([] (solve-1 (slurp input-txt)))
   ([ss] (pt1 (parse-input ss))))
 
 (defn solve-2
-  ([] (solve-2 (slurp "resources/2024/dayX.txt")))
+  ([] (solve-2 (slurp input-txt)))
   ([ss] (pt2 (parse-input ss))))
 
 (deftest tests []

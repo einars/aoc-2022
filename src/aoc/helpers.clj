@@ -1,8 +1,8 @@
 (ns aoc.helpers
   (:require
-    [clojure.string :as str]
-    [clojure.edn :as edn]
-    [clojure.java.io :as io]))
+   [clojure.string :as str]
+   [clojure.edn :as edn]
+   [clojure.java.io :as io]))
 
 (defn slurp-strings [file]
   (with-open [rdr (io/reader file)]
@@ -123,3 +123,15 @@
 
 (defn move [c dir]
   ((get moves dir identity) c))
+
+(defn tree-parse-int
+  ; replace [:int "5"] with 5,
+  ; useful for results of insta/parse
+  [tree]
+  (prn tree)
+  (cond
+    (and
+      (coll? tree)
+      (= :int (first tree))) (parse-long (second tree))
+    (coll? tree) (mapv tree-parse-int tree)
+    :else [:nop tree]))
