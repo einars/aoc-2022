@@ -39,6 +39,7 @@ nl       = '\n'
 (defn parse-input [t]
   (parse-tree (h/tree-parse-int (parser t))))
 
+(def ^:dynamic *concat-supported* false)
 
 (defn solve-eqn
   ([{:keys [target numbers]}]
@@ -47,7 +48,16 @@ nl       = '\n'
 
    (if-not rest
      (when (= target n) (conj accu n))
-     (or (solve-eqn (- target n) rest (conj accu "+" n))
+     (or 
+       (solve-eqn (- target n) rest (conj accu "+" n))
+
+       (and *concat-supported*
+         (str/ends-with? (str target) (str n))
+         (let [st (str target)]
+           (solve-eqn (or (parse-long (subs st 0 (- (count st) (count (str n))))) 0) 
+             rest 
+             (conj accu "||" n))))
+
        (when (= 0 (mod target n))
          (solve-eqn (/ target n) rest (conj accu "*" n)))))))
 
@@ -59,11 +69,10 @@ nl       = '\n'
     (mapv :target)
     (reduce +)))
 
-;(pt1 (parse-problem sample))
 
 (defn pt2
   [task]
-  0)
+  (binding [*concat-supported* true] (pt1 task)))
 
 (defn solve-1
   ([] (solve-1 (slurp input-txt)))
@@ -76,7 +85,7 @@ nl       = '\n'
 (deftest tests []
   (are [x y] (= x y)
     3749 (pt1 (parse-input sample))
-    2 (pt2 (parse-input sample))))
+    11387 (pt2 (parse-input sample))))
 
 (comment
   (solve-1)
