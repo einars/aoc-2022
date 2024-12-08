@@ -40,8 +40,8 @@
 
     ))
 
-(defn antinodes-for
-  [[a1 a2]]
+(defn antinodes-for-pt1
+  [a1 a2 _dim]
   (let [{x1 :x, y1 :y} a1
         {x2 :x, y2 :y} a2
         dx (- x2 x1)
@@ -52,8 +52,38 @@
      {:x (+ x2 dx)
       :y (+ y2 dy)}]))
 
-(defn antinodes-for-all [antennas]
-  (set (flatten (map antinodes-for (combo/combinations antennas 2)))))
+(defn antinodes-for-pt2
+  [a1 a2 dim]
+  (let [{x1 :x, y1 :y} a1
+        {x2 :x, y2 :y} a2
+        {mx :x, my :y} dim
+        dx (- x2 x1)
+        dy (- y2 y1)]
+
+    (let [dx (- x2 x1)
+          dy (- y2 y1)]
+      (concat
+        [a1 a2]
+        (loop [accu [] x (- x1 dx) y (- y1 dy)]
+          (if (and (>= x 0) (>= y 0) (< x mx) (< y my))
+            (recur (conj accu {:x x, :y y}) (- x dx) (- y dy))
+            accu))
+        (loop [accu [] x (+ x2 dx) y (+ y2 dy)]
+          (if (and (>= x 0) (>= y 0) (< x mx) (< y my))
+            (recur (conj accu {:x x, :y y}) (+ x dx) (+ y dy))
+            accu))))))
+
+
+(def ^:dynamic *antinode-fn* antinodes-for-pt1)
+
+(defn antinodes-for-all [antennas dimensions]
+  (->> (combo/combinations antennas 2)
+    (map (fn [[a1 a2]] (*antinode-fn* a1 a2 dimensions)))
+    flatten
+    (filter (partial inside-dimensions? dimensions))
+    set))
+
+
 
 (defn inside-dimensions?
   [dims pt]
@@ -65,35 +95,31 @@
       (<= 0 py)
       (< py my))))
 
-(defn pt1-get-all-antinodes [task]
+(defn get-all-antinodes [task]
   (->> task
     :antennas
     vals
-    (map antinodes-for-all)
+    (mapv #(antinodes-for-all % (:dimensions task)))
     (reduce set/union)))
 
 (defn pt1
   [task]
-  (->> (pt1-get-all-antinodes task)
-    (filter #(inside-dimensions? (:dimensions task) %))
-    count))
+  (count (get-all-antinodes task)))
 
-
-
-(comment let [
-              ;t (parse-input (slurp input-txt))
-              t (parse-input sample)
-              all (pt1-get-all-antinodes t)]
-  (prn (:dimensions t))
-  (doseq [x (range (inc (get-in t [:dimensions :x])))]
-    (doseq [y (range (inc (get-in t [:dimensions :y])))]
-      (print (if (all {:x x :y y}) "#" ".")))
-    (print "\n"))
-  )
 
 (defn pt2
   [task]
-  0)
+  (binding [*antinode-fn* antinodes-for-pt2]
+    (count (get-all-antinodes task))))
+
+(comment let [t (parse-input sample)
+              all (binding [*antinode-fn* antinodes-for-pt2] (get-all-antinodes t))]
+  (prn (:dimensions t))
+  (doseq [y (range (get-in t [:dimensions :y]))]
+    (doseq [x (range (get-in t [:dimensions :x]))]
+      (print (if (all {:x x :y y}) "#" ".")))
+    (print "\n"))
+  )
 
 (defn solve-1
   ([] (solve-1 (slurp input-txt)))
@@ -106,7 +132,7 @@
 (deftest tests []
   (are [x y] (= x y)
     14 (pt1 (parse-input sample))
-    2 (pt2 (parse-input sample))))
+    34 (pt2 (parse-input sample))))
 
 (comment
   (solve-1)
