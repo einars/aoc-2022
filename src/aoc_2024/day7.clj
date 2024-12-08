@@ -3,6 +3,7 @@
    [clojure.test :as test :refer [deftest is are]]
    [instaparse.core :as insta]
    [clojure.string :as str]
+   [clojure.math :as math]
    [aoc.helpers :as h]))
 
 (def input-txt "resources/2024/day7.txt")
@@ -40,26 +41,37 @@ nl       = '\n'
   (parse-tree (h/tree-parse-int (parser t))))
 
 (def ^:dynamic *concat-supported* false)
+(def ^:dynamic *concat-mode* :math)
 
 (defn solve-eqn
   ([{:keys [target numbers]}]
    (solve-eqn target (reverse numbers) []))
+
   ([target [n & rest] accu]
 
    (if-not rest
      (when (= target n) (conj accu n))
+
      (or 
-       (solve-eqn (- target n) rest (conj accu "+" n))
+       (solve-eqn (- target n) rest (conj accu n "+"))
 
        (and *concat-supported*
+         (= *concat-mode* :string)
          (str/ends-with? (str target) (str n))
          (let [st (str target)]
            (solve-eqn (or (parse-long (subs st 0 (- (count st) (count (str n))))) 0) 
              rest 
-             (conj accu "||" n))))
+             (conj accu n "||"))))
+
+       (and *concat-supported*
+         (= *concat-mode* :math)
+         (let [mask (reduce * (repeat (inc (int (math/log10 n))) 10))]
+           (when (= n (rem target mask))
+             (solve-eqn (quot target mask) rest (conj accu n "||")))))
 
        (when (= 0 (mod target n))
-         (solve-eqn (/ target n) rest (conj accu "*" n)))))))
+         (solve-eqn (quot target n) rest (conj accu n "*")))))))
+
 
 (defn pt1
   [task]
@@ -74,6 +86,13 @@ nl       = '\n'
   [task]
   (binding [*concat-supported* true] (pt1 task)))
 
+(binding [*concat-supported* true]
+  (mapv (fn [x] [(:target x) (apply str (reverse (:solution x)))])
+    (->> (parse-input (slurp input-txt))
+      (mapv (fn [t] (assoc t :solution (solve-eqn t))))
+      (filterv :solution)) ))
+
+
 (defn solve-1
   ([] (solve-1 (slurp input-txt)))
   ([ss] (pt1 (parse-input ss))))
@@ -86,6 +105,7 @@ nl       = '\n'
   (are [x y] (= x y)
     3749 (pt1 (parse-input sample))
     11387 (pt2 (parse-input sample))))
+
 
 (comment
   (solve-1)

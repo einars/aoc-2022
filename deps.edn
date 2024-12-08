@@ -6,7 +6,8 @@
         nrepl/nrepl {:mvn/version "1.1.0"}
         instaparse/instaparse {:mvn/version "1.4.12"}
         org.clojure/math.numeric-tower {:mvn/version "0.0.5"}
-        com.github.strojure/parsesso {:mvn/version "1.2.2+295"}}
+        com.github.strojure/parsesso {:mvn/version "1.2.2+295"}
+        org.clojure/math.combinatorics {:mvn/version "0.3.0"}}
  :aliases
  {:neil {:project {:name aoc/aoc :version "0.10.6"}}
   :run {:main-opts ["-m" "aoc.core"]}

@@ -21,7 +21,7 @@
 ......#..."))
 
 (defn parse-input [s]
-  (let [[area dimensions] (-> s (str/split #"\n\r") h/make-xy-map)
+  (let [[area dimensions] (-> s (str/split #"\r\n") h/make-xy-map)
         pos (first (filter (comp #{\^} area) (keys area)))]
     {:dimensions dimensions
      :pos pos

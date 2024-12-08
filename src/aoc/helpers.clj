@@ -128,10 +128,9 @@
   ; replace [:int "5"] with 5,
   ; useful for results of insta/parse
   [tree]
-  (prn tree)
   (cond
     (and
       (coll? tree)
       (= :int (first tree))) (parse-long (second tree))
     (coll? tree) (mapv tree-parse-int tree)
-    :else [:nop tree]))
+    :else tree))
