@@ -29,16 +29,15 @@
   (let [m (-> s (str/split #"\n") h/make-xy-map)
         area (first m)
         antenna-types (set (vals area))
-        antennas (into {} (mapv (fn [ant] 
-                                  [ant (h/find-keys #(= ant %) area)]) antenna-types))
-        ]
+        antennas (into {} 
+                   (mapv (fn [ant] 
+                           [ant 
+                            (h/find-keys #(= ant %) area)])
+                     antenna-types))]
 
     {:dimensions (second m)
      :antenna-types antenna-types
-     :antennas antennas
-     }
-
-    ))
+     :antennas antennas}))
 
 (defn antinodes-for-pt1
   [a1 a2 _dim]
@@ -60,30 +59,19 @@
         dx (- x2 x1)
         dy (- y2 y1)]
 
-    (let [dx (- x2 x1)
-          dy (- y2 y1)]
-      (concat
-        [a1 a2]
-        (loop [accu [] x (- x1 dx) y (- y1 dy)]
-          (if (and (>= x 0) (>= y 0) (< x mx) (< y my))
-            (recur (conj accu {:x x, :y y}) (- x dx) (- y dy))
-            accu))
-        (loop [accu [] x (+ x2 dx) y (+ y2 dy)]
-          (if (and (>= x 0) (>= y 0) (< x mx) (< y my))
-            (recur (conj accu {:x x, :y y}) (+ x dx) (+ y dy))
-            accu))))))
+    (concat
+      [a1 a2]
+      (loop [accu [] x (- x1 dx) y (- y1 dy)]
+        (if (and (>= x 0) (>= y 0) (< x mx) (< y my))
+          (recur (conj accu {:x x, :y y}) (- x dx) (- y dy))
+          accu))
+      (loop [accu [] x (+ x2 dx) y (+ y2 dy)]
+        (if (and (>= x 0) (>= y 0) (< x mx) (< y my))
+          (recur (conj accu {:x x, :y y}) (+ x dx) (+ y dy))
+          accu)))))
 
 
 (def ^:dynamic *antinode-fn* antinodes-for-pt1)
-
-(defn antinodes-for-all [antennas dimensions]
-  (->> (combo/combinations antennas 2)
-    (map (fn [[a1 a2]] (*antinode-fn* a1 a2 dimensions)))
-    flatten
-    (filter (partial inside-dimensions? dimensions))
-    set))
-
-
 
 (defn inside-dimensions?
   [dims pt]
@@ -94,6 +82,16 @@
       (< px mx)
       (<= 0 py)
       (< py my))))
+
+
+(defn antinodes-for-all [antennas dimensions]
+  (->> (combo/combinations antennas 2)
+    (map (fn [[a1 a2]] (*antinode-fn* a1 a2 dimensions)))
+    flatten
+    (filter (partial inside-dimensions? dimensions))
+    set))
+
+
 
 (defn get-all-antinodes [task]
   (->> task
