@@ -2,6 +2,8 @@
   (:require
    [clojure.test :as test :refer [deftest is are]]
    [clojure.string :as str]
+   [clojure.tools.trace :refer :all]
+   [instaparse.core :as insta]
    [aoc.helpers :as h]))
 
 (def input-txt "resources/2024/day6.txt")
