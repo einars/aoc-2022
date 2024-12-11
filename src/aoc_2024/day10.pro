@@ -3,7 +3,7 @@
 :- table stone/3.
 
 split_even_digits(N, H1, H2) :-
-  number_digits(N, Digits),
+  number_to_digits(N, Digits),
   length(Digits, Len),
   Len mod 2 =:= 0,
   Half is Len // 2,
@@ -22,7 +22,7 @@ digits_to_number(Digits, N) :-
 hjalp(Digit, Char) :-
   number_chars(Digit, [Char]).
 
-number_digits(N, Digits) :-
+number_to_digits(N, Digits) :-
   number_chars(N, Chars),
   maplist(atom_number, Chars, Digits).
 
