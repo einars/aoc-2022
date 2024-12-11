@@ -26,8 +26,7 @@ number_digits(N, Digits) :-
   number_chars(N, Chars),
   maplist(atom_number, Chars, Digits).
 
-stone(_, 0, R) :- 
-  R is 1.
+stone(_, 0, 1) :- !.
 
 stone(0, G, X) :-
   G > 0,
