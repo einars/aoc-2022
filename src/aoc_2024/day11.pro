@@ -16,28 +16,19 @@ split_even_digits(N, H1, H2) :-
 stone(_, 0, 1) :- !.
 
 stone(0, G, X) :-
-  G > 0,
   NG is G-1,
-  /* format('NG1 0 ~a ~n', G), */
-  stone(1, NG, X).
+  stone(1, NG, X), !.
 
 stone(N, G, X) :-
-  N > 0,
-  G > 0,
-  split_even_digits(N, H1, H2),
   NG is G-1,
-  /* format('NG2 ~a ~a > [~a ~a]~n', [N, G, H1, H2]), */
+  split_even_digits(N, H1, H2),
   stone(H1, NG, NX1),
   stone(H2, NG, NX2),
-  X is NX1+NX2.
+  X is NX1+NX2, !.
 
 stone(N, G, X) :-
-  N > 0,
-  G > 0,
-  \+ split_even_digits(N, _, _),
   NG is G-1,
   NN is 2024*N,
-  /* format('NG3 ~a ~a -> ~a~n', [N, G, NN]), */
   stone(NN, NG, X).
 
 pt1(N, Res) :-
