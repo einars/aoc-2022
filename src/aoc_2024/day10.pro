@@ -3,26 +3,15 @@
 :- table stone/3.
 
 split_even_digits(N, H1, H2) :-
-  number_to_digits(N, Digits),
+  number_chars(N, Digits),
   length(Digits, Len),
   Len mod 2 =:= 0,
   Half is Len // 2,
   length(NH1, Half),
   append(NH1, NH2, Digits),
-  digits_to_number(NH1, H1),
-  digits_to_number(NH2, H2).
+  number_chars(H1, NH1),
+  number_chars(H2, NH2).
 
-digits_to_number(Digits, N) :-
-  maplist(hjalp, Digits, CharList),
-  atom_chars(Atom, CharList),
-  atom_number(Atom, N).
-
-hjalp(Digit, Char) :-
-  number_chars(Digit, [Char]).
-
-number_to_digits(N, Digits) :-
-  number_chars(N, Chars),
-  maplist(atom_number, Chars, Digits).
 
 stone(_, 0, 1) :- !.
 
