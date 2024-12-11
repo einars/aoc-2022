@@ -9,10 +9,8 @@ split_even_digits(N, H1, H2) :-
   Half is Len // 2,
   length(NH1, Half),
   append(NH1, NH2, Digits),
-  digits_to_number(NH1, DH1),
-  digits_to_number(NH2, DH2),
-  H1 is DH1,
-  H2 is DH2.
+  digits_to_number(NH1, H1),
+  digits_to_number(NH2, H2).
 
 digits_to_number(Digits, N) :-
   maplist(hjalp, Digits, CharList),
@@ -32,8 +30,7 @@ stone(0, G, X) :-
   G > 0,
   NG is G-1,
   /* format('NG1 0 ~a ~n', G), */
-  stone(1, NG, NX),
-  X is NX.
+  stone(1, NG, X).
 
 stone(N, G, X) :-
   N > 0,
@@ -52,16 +49,13 @@ stone(N, G, X) :-
   NG is G-1,
   NN is 2024*N,
   /* format('NG3 ~a ~a -> ~a~n', [N, G, NN]), */
-  stone(NN, NG, NX),
-  X is NX.
+  stone(NN, NG, X).
 
 pt1(N, Res) :-
-  stone(N, 25, R),
-  Res is R.
+  stone(N, 25, Res).
 
 pt2(N, Res) :-
-  stone(N, 75, R),
-  Res is R.
+  stone(N, 75, Res).
 
 main(_) :-
   maplist(pt1, [1117, 0, 8, 21078, 2389032, 142881, 93, 385], N1),
