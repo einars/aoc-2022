@@ -26,87 +26,55 @@ MMMISSJEEE")
   (h/string->map s))
 
 (defn extract-region 
-  [[xy ch] area]
-  (loop [region #{xy}, area (dissoc area xy)]
-    (let [nbs (set (flatten (mapv h/neighbors-4 region)))
-          nbs (set/select #(= ch (get area %)) nbs)]
-
+  [xy area]
+  (loop [region #{xy}, area (disj area xy)]
+    (let [nbs (set (filterv area (mapcat h/neighbors-4 region)))]
       (if (empty? nbs)
-        [region area ]
-        (recur (set/union region nbs) (reduce dissoc area nbs))))))
+        [region area]
+        (recur (set/union region nbs) (set/difference area nbs))))))
 
 (defn extract-regions 
   [area]
-  (loop [work-area area, regions []]
+  (loop [work-area (set area), regions []]
     (if (empty? work-area)
       regions
       (let [[region remaining-area] (extract-region (first work-area) work-area)]
         (recur remaining-area (conj regions region))))))
 
+(defn split-area [area]
+  (mapcat #(extract-regions (h/find-keys #{%} area)) (set (vals area))))
+
 (defn area [region] (count region))
 
 (defn perimeter
   [region] 
-  (apply +
+  (reduce +
     (for [c region]
-      (count (filter (complement region) (h/neighbors-4 c))))))
-
-(defn extract-horizontal-side 
-  [xy span]
-  (loop [side #{xy}, span (disj span xy)]
-    (let [nbs (set (flatten (map h/neighbors-h side)))
-          nbs (set/select span nbs)]
-      (if (empty? nbs)
-        [side span]
-        (recur (set/union side nbs) (set/difference span nbs))))))
-
-(defn extract-vertical-side 
-  [xy span]
-  (loop [side #{xy}, span (disj span xy)]
-    (let [nbs (set (flatten (map h/neighbors-v side)))
-          nbs (set/select span nbs)]
-      (if (empty? nbs)
-        [side span]
-        (recur (set/union side nbs) (set/difference span nbs))))))
-
-(defn extract-horizontal-sides
-  [spans]
-  (loop [spans (set spans), accu []]
-    (if (empty? spans)
-      accu
-      (let [[side remaining-spans] (extract-horizontal-side (first spans) spans)]
-        (recur remaining-spans (conj accu side))))))
-
-(defn extract-vertical-sides
-  [spans]
-  (loop [spans (set spans), accu []]
-    (if (empty? spans)
-      accu
-      (let [[side remaining-spans] (extract-vertical-side (first spans) spans)]
-        (recur remaining-spans (conj accu side))))))
+      (h/count-where (complement region) (h/neighbors-4 c)))))
 
 (defn count-sides
   [region]
   (+ 
-    (count (extract-horizontal-sides
-             (filter (fn [c] (not (region (h/top-of c)))) region)))
-    (count (extract-horizontal-sides
-             (filter (fn [c] (not (region (h/bottom-of c)))) region)))
-    (count (extract-vertical-sides
-             (filter (fn [c] (not (region (h/left-of c)))) region)))
-    (count (extract-vertical-sides
-             (filter (fn [c] (not (region (h/right-of c)))) region)))))
+    (count (extract-regions
+             ;(filterv (fn [c] (not (region (h/top-of c)))) region)))
+             (filterv (comp not region h/top-of)  region)))
+    (count (extract-regions
+             (filterv (fn [c] (not (region (h/bottom-of c)))) region)))
+    (count (extract-regions
+             (filterv (fn [c] (not (region (h/left-of c)))) region)))
+    (count (extract-regions
+             (filterv (fn [c] (not (region (h/right-of c)))) region)))))
 
 (defn pt1
   [task]
-  (apply +
-    (for [r (extract-regions task)]
+  (reduce +
+    (for [r (split-area task)]
       (* (area r) (perimeter r)))))
 
 (defn pt2
   [task]
-  (apply +
-    (for [r (extract-regions task)]
+  (reduce +
+    (for [r (split-area task)]
       (* (area r) (count-sides r)))))
 
 (defn solve-1
@@ -120,7 +88,8 @@ MMMISSJEEE")
 (deftest tests []
   (are [x y] (= x y)
     1930 (pt1 (parse-input sample))
-    1206 (pt2 (parse-input sample))))
+    1206 (pt2 (parse-input sample))
+    ))
 
 (comment
   (solve-1)
