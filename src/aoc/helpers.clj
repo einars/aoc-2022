@@ -87,6 +87,16 @@
 (defn to-int-list [s]
   (mapv #(Integer/parseInt %) (str/split (str/trim s) #",")))
 
+(defn neighbors-h
+  [{:keys [x y]}]
+  [{:x (inc x) :y y}
+   {:x (dec x) :y y}])
+
+(defn neighbors-v
+  [{:keys [x y]}]
+  [{:x x :y (inc y)}
+   {:x x :y (dec y)}])
+
 (defn neighbors-4
   [{:keys [x y]}]
   [{:x (inc x) :y y}
@@ -134,3 +144,8 @@
       (= :int (first tree))) (parse-long (second tree))
     (coll? tree) (mapv tree-parse-int tree)
     :else tree))
+
+(defn count-where 
+  [pred coll] 
+  (reduce (fn [accu n] (if (pred n) (inc accu) accu)) 0 coll))
+  

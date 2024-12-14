@@ -56,8 +56,7 @@ MMMISSJEEE")
   [region]
   (+ 
     (count (extract-regions
-             ;(filterv (fn [c] (not (region (h/top-of c)))) region)))
-             (filterv (comp not region h/top-of)  region)))
+             (filterv (fn [c] (not (region (h/top-of c)))) region)))
     (count (extract-regions
              (filterv (fn [c] (not (region (h/bottom-of c)))) region)))
     (count (extract-regions

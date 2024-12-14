@@ -98,8 +98,7 @@ nl    = '\n'
         mb (- (* ax by) (* ay bx))
         m (quot ma mb)]
     (when (= 0 (rem ma mb))
-      (let [m (quot ma mb)
-            na (- x (* m bx))
+      (let [na (- x (* m bx))
             nb ax
             n (quot na nb) ]
         (when (= 0 (rem na nb))
@@ -134,6 +133,7 @@ nl    = '\n'
   (are [x y] (= x y)
     480 (pt1 (parse-input sample))))
 
+(pt2 (parse-input sample))
 (comment
   (solve-1)
   (solve-2))

@@ -37,7 +37,7 @@
 
 (defn pt1
   [task]
-  (reduce + (map #(get-length % 25) task)))
+  (reduce + (map #(get-length % 500) task)))
 
 (defn pt2
   [task]
