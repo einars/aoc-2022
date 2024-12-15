@@ -96,23 +96,20 @@ nl = '\n'
   [task]
   (reduce * 1 (quadrants (mapv #(walk-robot-times % 100) task))))
 
-(defn run-print [robots]
+(defn pt2 [robots]
   (let [[n quads robots]
         (->> [0 (quadrants robots) robots]
           (iterate (fn [[it quads rs]] 
-                     (prn it)
+                     #_(prn it)
                      (let [new-robots (mapv walk-robot-step rs)]
                        [(inc it) (reduce * 1 (quadrants new-robots)) new-robots])))
           (drop 1)
           (take 10000)
           (sort-by second)
           (first))]
-    (print-robots n robots)))
+    (print-robots n robots)
+    n))
 
-
-(defn pt2
-  [task]
-  (run-print task))
 
 (defn solve-1
   ([] (solve-1 (slurp input-txt)))
