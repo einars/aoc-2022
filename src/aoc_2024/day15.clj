@@ -46,6 +46,14 @@ v^^>>><<^^<>>^v^<v^vv<>v^<<>^<^v^v><^<<<><<^<v><v<>vv>>v><v^<vv<>v^<<^
 
     [walls robot boxes moves]))
 
+(defn prepare-part-2 [walls robot boxes moves]
+  (let [w1 (mapv (fn [c]  (update c :x #(* % 2))) walls)
+        w2 (mapv (fn [c] (update c :x #(inc (* % 2)))) walls)
+        walls (set (concat w1 w2))
+        robot (update robot :x #(* 2 %))
+        boxes (set (mapv (fn [c] (update c :x #(* % 2))) boxes))]
+    [walls robot boxes moves]))
+
 (def move-fns
   {\< h/left-of
    \> h/right-of
@@ -53,17 +61,54 @@ v^^>>><<^^<>>^v^<v^vv<>v^<<>^<^v^v><^<<<><<^<v><v<>vv>>v><v^<vv<>v^<<^
    \v h/bottom-of})
 
 (defn slurp-boxes
-  [pos dir-fn walls boxes] 
-  (loop [pos (dir-fn pos) accum []]
-    (cond 
-      (walls pos) nil
-      (boxes pos) (recur (dir-fn pos) (conj accum pos))
-      :else accum)))
+  [pos move walls boxes] 
+  (let [dir-fn (move-fns move)]
+    (loop [pos (dir-fn pos) accum []]
+      (cond 
+        (walls pos) nil
+        (boxes pos) (recur (dir-fn pos) (conj accum pos))
+        :else accum))))
+
+(defn debug-pt-2 [robot walls boxes]
+  (let [mm {robot "@"}
+        mm (reduce (fn [mm w] (assoc mm w "#")) mm walls)
+        mm (reduce (fn [mm w] (assoc mm w "[")) mm boxes)]
+    (h/print-map mm)))
+
+(defn slurp-boxes-pt2
+  ([pos move walls boxes] (slurp-boxes-pt2 pos move walls boxes []))
+  ([pos move walls boxes accum] 
+   (let [dir-fn (move-fns move)]
+     (loop [pos (dir-fn pos) accum accum]
+       (cond 
+         (walls pos) nil
+
+         (#{\<} move)
+         (do
+           (if (boxes (h/left-of pos))
+             (recur (h/left-of (h/left-of pos)) (conj accum (h/left-of pos)))
+             accum))
+
+         (#{\>} move)
+         (if (boxes pos)
+           (recur (h/right-of (h/right-of pos)) (conj accum pos))
+           accum)
+
+         :else
+         (let [b1 (if (boxes pos) (slurp-boxes-pt2 pos move walls boxes [pos]) accum)
+               b2 (if (boxes pos) (slurp-boxes-pt2 (h/right-of pos) move walls boxes [pos]) accum)
+               b3 (if (boxes (h/left-of pos)) (slurp-boxes-pt2 (h/left-of pos) move walls boxes [(h/left-of pos)]) accum)
+               b4 (if (boxes (h/left-of pos)) (slurp-boxes-pt2 pos move walls boxes [(h/left-of pos)]) accum)]
+           (if (or (nil? b1) (nil? b2) (nil? b3) (nil? b4))
+             nil
+             (set (concat b1 b2 b3 b4)))))))))
 
 
 (defn apply-move [move robot walls boxes]
   (let [dir-fn (move-fns move)
-        moved-boxes (slurp-boxes robot dir-fn walls boxes)]
+        moved-boxes (cond
+                      (= *part* 1) (slurp-boxes robot move walls boxes)
+                      (= *part* 2) (slurp-boxes-pt2 robot move walls boxes))]
 
     (if (nil? moved-boxes)
       [robot boxes]
@@ -86,12 +131,15 @@ v^^>>><<^^<>>^v^<v^vv<>v^<<>^<^v^v><^<<<><<^<v><v<>vv>>v><v^<vv<>v^<<^
   [task]
   (let [[w r b m] task
         [r b] (apply-moves m r w b)]
-    (box-score b))
-  0)
+    (box-score b)))
 
 (defn pt2
   [task]
-  0)
+  (binding [*part* 2]
+    (let [[w r b m] task
+          [w r b m] (prepare-part-2 w r b m)
+          [r b] (apply-moves m r w b)]
+      (box-score b))))
 
 (defn solve-1
   ([] (solve-1 (slurp input-txt)))
@@ -104,7 +152,7 @@ v^^>>><<^^<>>^v^<v^vv<>v^<<>^<^v^v><^<<<><<^<v><v<>vv>>v><v^<vv<>v^<<^
 (deftest tests []
   (are [x y] (= x y)
     10092 (pt1 (parse-input sample))
-    2 (pt2 (parse-input sample))))
+    9021 (pt2 (parse-input sample))))
 
 (comment
   (solve-1)
