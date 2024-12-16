@@ -39,9 +39,13 @@
   (let [{:keys [xmin ymin xmax ymax]} (map-dimensions m)]
     (println (format "x=%d..%d, y=%d..%d" xmin xmax ymin ymax))
     (doseq [y (range ymin (inc ymax))]
-      (doseq [x (range xmin (inc xmax))]
-        (print (get m {:x x :y y} ".")))
-      (print "\n"))))
+      (println (apply str (for [x (range xmin (inc xmax))]
+                            (get m {:x x :y y} ".")))))))
+(defn repr-map [m]
+  (let [{:keys [xmin ymin xmax ymax]} (map-dimensions m)]
+    (apply str (for [y (range ymin (inc ymax))]
+                 (str (apply str (for [x (range xmin (inc xmax))]
+                                   (get m {:x x :y y} "."))) "\n")))))
 
 (defn slurp-xy-map
   "read the file as a 2d visual map and return [hashmap of coord -> char, dimensions]
