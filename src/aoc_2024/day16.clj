@@ -91,22 +91,19 @@
                              (conj new-front {:pos (h/move pos facing) 
                                               :facing facing 
                                               :score (inc score)
-                                              :path (conj path (h/move pos facing))
-                                              }))
+                                              :path (conj path (h/move pos facing))}))
                  new-front (if (walls (h/move pos (turn-right facing)))
                              new-front
                              (conj new-front {:pos (h/move pos (turn-right facing)) 
                                               :facing (turn-right facing) 
                                               :score (+ score 1001)
-                                              :path (conj path (h/move pos (turn-right facing)))
-                                              }))
+                                              :path (conj path (h/move pos (turn-right facing)))}))
                  new-front (if (walls (h/move pos (turn-left facing)))
                              new-front
                              (conj new-front {:pos (h/move pos (turn-left facing)) 
                                               :facing (turn-left facing) 
                                               :score (+ score 1001)
-                                              :path (conj path (h/move pos (turn-left facing)))
-                                              }))]
+                                              :path (conj path (h/move pos (turn-left facing)))}))]
              (recur xs new-front known-best))))))))
 
 
