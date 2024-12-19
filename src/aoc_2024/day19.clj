@@ -27,24 +27,22 @@ bbrgwb")
         patterns (str/split patterns #"\n")]
     [towels patterns]))
 
-(def pattern-possible?)
-(defn pattern-possible-impl? [pattern towels]
+(defn pattern-possible? [pattern towels]
   (if (= "" pattern) true
     (some identity (for [towel (filter (partial str/starts-with? pattern) towels)]
                      (pattern-possible? (subs pattern (count towel)) towels)))))
-(def pattern-possible? (memoize pattern-possible-impl?))
+(def pattern-possible? (memoize pattern-possible?))
 
 (defn pt1
   [[towels patterns]]
   (count (filter #(pattern-possible? % towels) patterns)))
 
 
-(def n-possibilities)
-(defn n-possibilities-impl [pattern towels]
+(defn n-possibilities [pattern towels]
   (if (= "" pattern) 1
     (reduce + (for [towel (filter (partial str/starts-with? pattern) towels)]
                 (n-possibilities (subs pattern (count towel)) towels)))))
-(def n-possibilities (memoize n-possibilities-impl))
+(def n-possibilities (memoize n-possibilities))
 
 (defn pt2
   [[towels patterns]]
