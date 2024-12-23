@@ -71,8 +71,7 @@
 (defn zip [& xs] (apply map vector xs))
 
 (defn indexed [xs]
-  (let [n (count xs)]
-    (map vector (range n) xs)))
+    (map vector (range) xs))
 
 (defn indexed-1 [xs]
   (let [n (count xs)]
